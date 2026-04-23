@@ -341,6 +341,13 @@ a { color: var(--accent); text-decoration: none; }
   display: block; font-weight: 600; font-size: 0.85rem;
   color: var(--text-secondary); margin-bottom: 8px;
 }
+.response-hint {
+  font-size: 0.8rem; color: var(--text-muted); line-height: 1.5;
+  background: var(--bg-elevated); border-left: 3px solid var(--accent);
+  padding: 10px 14px; border-radius: var(--radius-sm);
+  margin-bottom: 10px;
+}
+.response-hint strong { color: var(--text-secondary); font-weight: 600; }
 .response-textarea {
   width: 100%; min-height: 120px; padding: 16px;
   border-radius: var(--radius-md); border: 2px solid var(--border);
@@ -717,7 +724,8 @@ a { color: var(--accent); text-decoration: none; }
       <!-- Response -->
       <div class="response-area">
         <label id="responseLabel">Sua análise</label>
-        <textarea class="response-textarea" id="responseText" placeholder="Descreva sua análise de forma detalhada e precisa..." oninput="updateCharCount()"></textarea>
+        <div class="response-hint" id="responseHint">💡 Quanto mais específico você for sobre <strong>o que</strong> investigar, <strong>por que</strong> e <strong>como</strong>, mais rica será a resposta e maior sua pontuação. Nomear apenas a categoria ("farei uma anamnese") rende pouco — articule os eixos concretos.</div>
+        <textarea class="response-textarea" id="responseText" placeholder="Seja específico: liste os eixos que quer investigar, o que procura em cada um, e por quê..." oninput="updateCharCount()"></textarea>
         <div class="char-counter" id="charCounter">0 palavras</div>
       </div>
 
@@ -904,30 +912,75 @@ Após cada turno (a partir do turno 2), calcule a média dos 4 indicadores. Se a
 Máximo acumulável no turno atual: Acurácia/Fundamentação/Conduta = ${pts} × turnos jogados. Segurança = 50 + ${pts} × turnos jogados.
 
 REGRA DE PROPORCIONALIDADE — A MAIS IMPORTANTE DE TODAS:
-A qualidade e riqueza da informação revelada na narrativa deve ser ESTRITAMENTE PROPORCIONAL ao que o profissional ARTICULOU no texto livre dele. NUNCA complete pelo profissional. NUNCA atribua a ele perguntas, observações ou raciocínios que ele não escreveu.
 
-Se o profissional apenas NOMEIA uma categoria de investigação sem especificar o que procura ("vou fazer uma anamnese", "vou examinar o couro"), trate isso como uma investigação GENÉRICA e RASA. A paciente responde de forma vaga, oferece apenas queixa superficial, NÃO elabora gatilhos espontaneamente. O profissional sai com pouco material. Você narra a frustração ou limitação da interação — a paciente olha confusa esperando perguntas mais direcionadas, ou responde com monossílabos.
+Esta é a regra mais importante do simulador. Ela tem três partes obrigatórias. Violá-la faz o simulador perder seu propósito pedagógico.
 
-Se o profissional ESPECIFICA eixos de investigação ("vou investigar cronologia, histórico hormonal, estresse recente, medicações, histórico familiar de alopecia"), narre uma anamnese rica apenas sobre os eixos que ele explicitou. Informações sobre eixos NÃO mencionados pelo profissional NÃO aparecem — mesmo que fossem clinicamente relevantes.
+═══════════════════════════════════════════════════════════════
+PARTE 1 — PROTOCOLO DE TRADUÇÃO LITERAL
+═══════════════════════════════════════════════════════════════
 
-Exemplos concretos (CERTO vs ERRADO):
+Antes de gerar a narrativa, faça internamente este exercício:
 
-CERTO — aluno escreve: "Farei uma anamnese."
-Narrativa: "Você abre o prontuário e pergunta a Carolina o que a trouxe. Ela responde vagamente: 'Ah, tá caindo muito cabelo, sabe?' Você espera que ela elabore, mas ela apenas olha pra você, esperando a próxima pergunta. A consulta ameaça virar um silêncio desconfortável. Você percebe que uma anamnese sem direcionamento produz pouca informação útil."
-Feedback: "Você escolheu o instrumento correto (anamnese), mas não a direcionou. Uma anamnese em tricologia precisa ser ativamente conduzida: cronologia da queda, padrão de distribuição, gatilhos nos últimos 3-6 meses (estresse, doença, medicação, mudança hormonal), histórico familiar, uso de anticoncepcional, alimentação. Sem explicitar o que você busca, a paciente não tem como te ajudar. Acurácia Observacional baixa neste turno."
+1. COPIE mentalmente o texto EXATO que o profissional escreveu.
+2. EXTRAIA a lista de eixos/perguntas/observações que ele EXPLICITOU com suas próprias palavras.
+3. A narrativa só pode conter informação correspondente aos itens dessa lista.
+4. Qualquer eixo ausente da lista do aluno está AUSENTE da narrativa — mesmo que seja clinicamente óbvio, mesmo que seja a causa provável do caso.
 
-ERRADO — aluno escreve: "Farei uma anamnese."
-Narrativa: "Carolina relata que há 2-3 meses começou a queda, que teve uma semana de gripe há 5 meses, que parou o anticoncepcional há 8 meses..." (ERRADO porque a IA está perguntando PELO aluno e entregando um resultado que o aluno não conquistou)
+REGRA DURA: se o aluno escreveu N palavras descrevendo a investigação, a paciente não pode responder sobre mais tópicos do que estão contidos naquelas N palavras. É proibido "preencher" o que o aluno não disse.
 
-CERTO — aluno escreve: "Investigarei cronologia da queda, padrão de distribuição, gatilhos nos últimos 6 meses incluindo estresse, doença e medicação, histórico familiar, e uso ou interrupção recente de anticoncepcional."
-Narrativa: Narre a anamnese detalhada cobrindo EXATAMENTE esses eixos. Se o aluno não pediu sobre dieta, NÃO apareça informação sobre dieta mesmo que seja relevante.
+Exemplos de tradução literal:
 
-A regra vale para TODAS as fases, não só Observação. Na Fundamentação, se o aluno só diz "há relação com o ciclo capilar", trate como raciocínio raso e peça mais. Não complete a fundamentação por ele. Na Conduta, se ele só diz "vou encaminhar", trate como conduta incompleta — encaminhar para quem, justificando o quê, com que urgência, comunicando como à paciente?
+• Aluno escreve: "Farei uma anamnese"
+  Eixos extraídos: [anamnese — não-especificada]
+  Narrativa permitida: apenas uma pergunta genérica ("o que te traz aqui?"). Paciente responde apenas a queixa básica. NENHUM outro dado aparece — nem cronologia, nem gatilhos, nem histórico familiar, nem anticoncepcional, nem alimentação.
 
-O FEEDBACK deve apontar o que faltou NA AÇÃO DO ALUNO (não na investigação hipoteticamente ideal como se ele tivesse feito tudo). Frases como "faltou investigar X" só são apropriadas se o aluno de fato investigou outras coisas mas esqueceu X. Se ele não investigou nada, o feedback é "você não direcionou a investigação — um profissional precisa especificar o que busca".
+• Aluno escreve: "Farei uma anamnese para identificar gatilhos"
+  Eixos extraídos: [anamnese, gatilhos]
+  Narrativa permitida: pergunta genérica de abertura + pergunta sobre gatilhos. Paciente responde queixa + menciona algum gatilho (um só, o mais saliente). NÃO aparece histórico familiar. NÃO aparece uso de medicamentos. NÃO aparece alimentação. NÃO aparece ciclo menstrual. Mesmo que sejam relevantes.
+
+• Aluno escreve: "Anamnese focada em cronologia da queda, estresse recente, doenças agudas nos últimos 6 meses, medicações, anticoncepcional e histórico familiar"
+  Eixos extraídos: [cronologia, estresse, doenças agudas, medicações, anticoncepcional, histórico familiar]
+  Narrativa permitida: anamnese rica cobrindo EXATAMENTE esses 6 eixos. NÃO aparece dieta. NÃO aparece ciclo menstrual. NÃO aparece prurido/dor.
+
+═══════════════════════════════════════════════════════════════
+PARTE 2 — FORMATO OBRIGATÓRIO DO FEEDBACK
+═══════════════════════════════════════════════════════════════
+
+O parágrafo "📝 Feedback:" deve OBRIGATORIAMENTE começar nomeando de forma literal o que o aluno escreveu e caracterizando a especificidade. Formato:
+
+"📝 Feedback: Você escreveu [citação literal ou paráfrase fiel do texto do aluno]. Isso é [genérico / parcialmente específico / bem articulado]. A investigação que você conduziu de fato cobriu: [lista literal dos eixos explicitados pelo aluno]. Ficou de fora [lista dos eixos não mencionados que seriam esperados no contexto]. [Consequência para os indicadores e orientação para o próximo turno.]"
+
+NUNCA elogie o aluno por conduzir uma investigação que ele não articulou no texto. Frases como "você conduziu a anamnese de forma estruturada e acolhedora, cobrindo os pilares essenciais" SÃO PROIBIDAS se o aluno escreveu apenas "farei uma anamnese" — porque ele NÃO conduziu a anamnese de forma estruturada, ele apenas nomeou o instrumento.
+
+Exemplos de feedback nos 3 cenários acima:
+
+• Cenário 1 (aluno: "Farei uma anamnese"):
+  "📝 Feedback: Você escreveu apenas 'farei uma anamnese', sem especificar o que investigaria. Isso é genérico — equivale a sentar com a paciente sem plano de escuta. A investigação que você conduziu de fato cobriu: apenas a queixa principal. Ficou de fora TUDO o que caracteriza uma anamnese tricológica: cronologia da queda, gatilhos dos últimos 3-6 meses (estresse, doença aguda, mudança hormonal, medicação), histórico familiar, hábitos alimentares, ciclo menstrual. Acurácia Observacional baixa neste turno. Na próxima investigação, explicite os eixos que você quer cobrir — quanto mais específico você for, mais informação a paciente poderá te dar."
+
+• Cenário 2 (aluno: "Farei uma anamnese para identificar gatilhos"):
+  "📝 Feedback: Você escreveu 'farei uma anamnese para identificar gatilhos'. Isso é parcialmente específico — você nomeou um eixo (gatilhos), mas deixou outros em aberto. A investigação que você conduziu de fato cobriu: gatilhos recentes. Ficou de fora: cronologia da queda, padrão de distribuição, histórico familiar, uso e interrupção de anticoncepcional, ciclo menstrual, medicações regulares, alimentação. Em tricologia, uma anamnese direcionada apenas a gatilhos pega um pedaço importante, mas insuficiente. Pontuação parcial em Acurácia. Para os próximos turnos, considere explicitar TODOS os eixos de investigação que quer cobrir no seu texto."
+
+• Cenário 3 (aluno lista 6 eixos explicitamente):
+  "📝 Feedback: Você escreveu uma investigação bem articulada, nomeando cronologia, estresse, doenças agudas, medicações, anticoncepcional e histórico familiar. Isso é bem articulado. A investigação que você conduziu cobriu exatamente esses 6 eixos. Ficou de fora apenas alimentação e ciclo menstrual, que poderiam agregar. Acurácia Observacional alta neste turno."
+
+═══════════════════════════════════════════════════════════════
+PARTE 3 — PEDAGOGIA DA ESPECIFICIDADE
+═══════════════════════════════════════════════════════════════
+
+O simulador ensina que ESPECIFICIDADE rende mais pontos. O aluno precisa aprender isso através da experiência, não de uma regra abstrata. Por isso:
+
+- Primeiro turno com texto genérico → Acurácia baixa é ESPERADO e PEDAGÓGICO. Não suavize.
+- Feedback sempre termina com orientação concreta sobre como articular melhor no próximo turno.
+- Se o aluno melhorar a especificidade nos turnos seguintes, a pontuação sobe visivelmente — e o feedback reconhece a evolução explicitamente ("você está articulando com mais precisão agora").
+
+A regra vale para TODAS as fases:
+- Fundamentação: se o aluno só diz "tem a ver com o ciclo capilar", aponte a generalidade. Não complete a fundamentação por ele.
+- Conduta: se ele só diz "vou encaminhar", aponte a incompletude. Encaminhar para quem? Justificando o quê? Com que urgência? Comunicando como à paciente?
+
+═══════════════════════════════════════════════════════════════
 
 DOSAGEM DE INFORMAÇÃO POR MÉTODO:
-Na Observação, o profissional escolhe UMA ÚNICA investigação por turno. Dentro daquele método, revele SOMENTE o que o método revelaria (respeitando SEMPRE a Regra de Proporcionalidade acima):
+Na Observação, o profissional escolhe UMA ÚNICA investigação por turno. Dentro daquele método, revele SOMENTE o que o método revelaria E SOMENTE sobre os eixos que o aluno explicitou (Parte 1 acima tem precedência):
 - Anamnese → queixa, cronologia, gatilhos (estresse, doença, medicação), histórico familiar, hábitos. NÃO descreva achados visuais ou de toque.
 - Exame visual → o que se VÊ: distribuição da queda, densidade, rarefação, coloração do couro. NÃO inclua informações de anamnese.
 - Análise da haste → diâmetro, elasticidade, fragilidade, cutícula, pontos de fratura.
@@ -937,9 +990,9 @@ NUNCA misture achados de métodos diferentes. Se o profissional só fez anamnese
 Ao final de cada turno de Observação, lance um próximo desafio que motive a escolha da próxima investigação.
 
 REGRAS ADICIONAIS:
-- NÃO há mínimo de palavras. Julgue pela QUALIDADE, PROFUNDIDADE e ESPECIFICIDADE da articulação.
-- Resposta genérica (só nomeia categoria, sem especificar) → narrativa revela pouco, pontos baixos em Acurácia, feedback explica que faltou direcionar.
-- Resposta específica e articulada → narrativa revela exatamente sobre o que foi perguntado, pontos altos proporcionais à profundidade.
+- NÃO há mínimo de palavras. Julgue pela ESPECIFICIDADE da articulação (vide Parte 1).
+- Resposta genérica → narrativa revela pouco, pontos baixos em Acurácia, feedback no formato obrigatório da Parte 2.
+- Resposta específica → narrativa revela exatamente o que foi articulado, pontos altos proporcionais à profundidade.
 - Decisão perigosa → penalize fortemente Segurança do Cliente.
 - Fase de Fundamentação: espere articulação entre achados e teoria. Narre a reação do preceptor.
 - Fase de Conduta: narre consequências da decisão — paciente reage, preceptor avalia.
