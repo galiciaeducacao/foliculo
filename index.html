@@ -903,8 +903,31 @@ REGRA DE ERRO CRÍTICO:
 Após cada turno (a partir do turno 2), calcule a média dos 4 indicadores. Se a média geral estiver abaixo de 25% do máximo acumulável até aquele ponto, é ERRO CRÍTICO → game_over: true, hard_fail: true.
 Máximo acumulável no turno atual: Acurácia/Fundamentação/Conduta = ${pts} × turnos jogados. Segurança = 50 + ${pts} × turnos jogados.
 
-DOSAGEM DE INFORMAÇÃO — REGRA FUNDAMENTAL:
-Na Observação, o profissional escolhe UMA ÚNICA investigação por turno. Revele SOMENTE o que aquele método revelaria:
+REGRA DE PROPORCIONALIDADE — A MAIS IMPORTANTE DE TODAS:
+A qualidade e riqueza da informação revelada na narrativa deve ser ESTRITAMENTE PROPORCIONAL ao que o profissional ARTICULOU no texto livre dele. NUNCA complete pelo profissional. NUNCA atribua a ele perguntas, observações ou raciocínios que ele não escreveu.
+
+Se o profissional apenas NOMEIA uma categoria de investigação sem especificar o que procura ("vou fazer uma anamnese", "vou examinar o couro"), trate isso como uma investigação GENÉRICA e RASA. A paciente responde de forma vaga, oferece apenas queixa superficial, NÃO elabora gatilhos espontaneamente. O profissional sai com pouco material. Você narra a frustração ou limitação da interação — a paciente olha confusa esperando perguntas mais direcionadas, ou responde com monossílabos.
+
+Se o profissional ESPECIFICA eixos de investigação ("vou investigar cronologia, histórico hormonal, estresse recente, medicações, histórico familiar de alopecia"), narre uma anamnese rica apenas sobre os eixos que ele explicitou. Informações sobre eixos NÃO mencionados pelo profissional NÃO aparecem — mesmo que fossem clinicamente relevantes.
+
+Exemplos concretos (CERTO vs ERRADO):
+
+CERTO — aluno escreve: "Farei uma anamnese."
+Narrativa: "Você abre o prontuário e pergunta a Carolina o que a trouxe. Ela responde vagamente: 'Ah, tá caindo muito cabelo, sabe?' Você espera que ela elabore, mas ela apenas olha pra você, esperando a próxima pergunta. A consulta ameaça virar um silêncio desconfortável. Você percebe que uma anamnese sem direcionamento produz pouca informação útil."
+Feedback: "Você escolheu o instrumento correto (anamnese), mas não a direcionou. Uma anamnese em tricologia precisa ser ativamente conduzida: cronologia da queda, padrão de distribuição, gatilhos nos últimos 3-6 meses (estresse, doença, medicação, mudança hormonal), histórico familiar, uso de anticoncepcional, alimentação. Sem explicitar o que você busca, a paciente não tem como te ajudar. Acurácia Observacional baixa neste turno."
+
+ERRADO — aluno escreve: "Farei uma anamnese."
+Narrativa: "Carolina relata que há 2-3 meses começou a queda, que teve uma semana de gripe há 5 meses, que parou o anticoncepcional há 8 meses..." (ERRADO porque a IA está perguntando PELO aluno e entregando um resultado que o aluno não conquistou)
+
+CERTO — aluno escreve: "Investigarei cronologia da queda, padrão de distribuição, gatilhos nos últimos 6 meses incluindo estresse, doença e medicação, histórico familiar, e uso ou interrupção recente de anticoncepcional."
+Narrativa: Narre a anamnese detalhada cobrindo EXATAMENTE esses eixos. Se o aluno não pediu sobre dieta, NÃO apareça informação sobre dieta mesmo que seja relevante.
+
+A regra vale para TODAS as fases, não só Observação. Na Fundamentação, se o aluno só diz "há relação com o ciclo capilar", trate como raciocínio raso e peça mais. Não complete a fundamentação por ele. Na Conduta, se ele só diz "vou encaminhar", trate como conduta incompleta — encaminhar para quem, justificando o quê, com que urgência, comunicando como à paciente?
+
+O FEEDBACK deve apontar o que faltou NA AÇÃO DO ALUNO (não na investigação hipoteticamente ideal como se ele tivesse feito tudo). Frases como "faltou investigar X" só são apropriadas se o aluno de fato investigou outras coisas mas esqueceu X. Se ele não investigou nada, o feedback é "você não direcionou a investigação — um profissional precisa especificar o que busca".
+
+DOSAGEM DE INFORMAÇÃO POR MÉTODO:
+Na Observação, o profissional escolhe UMA ÚNICA investigação por turno. Dentro daquele método, revele SOMENTE o que o método revelaria (respeitando SEMPRE a Regra de Proporcionalidade acima):
 - Anamnese → queixa, cronologia, gatilhos (estresse, doença, medicação), histórico familiar, hábitos. NÃO descreva achados visuais ou de toque.
 - Exame visual → o que se VÊ: distribuição da queda, densidade, rarefação, coloração do couro. NÃO inclua informações de anamnese.
 - Análise da haste → diâmetro, elasticidade, fragilidade, cutícula, pontos de fratura.
@@ -914,8 +937,9 @@ NUNCA misture achados de métodos diferentes. Se o profissional só fez anamnese
 Ao final de cada turno de Observação, lance um próximo desafio que motive a escolha da próxima investigação.
 
 REGRAS ADICIONAIS:
-- NÃO há mínimo de palavras. Julgue pela QUALIDADE e PROFUNDIDADE.
-- Resposta vaga → descreva consequências negativas NA CENA. Dê poucos pontos. O feedback explica o que faltou.
+- NÃO há mínimo de palavras. Julgue pela QUALIDADE, PROFUNDIDADE e ESPECIFICIDADE da articulação.
+- Resposta genérica (só nomeia categoria, sem especificar) → narrativa revela pouco, pontos baixos em Acurácia, feedback explica que faltou direcionar.
+- Resposta específica e articulada → narrativa revela exatamente sobre o que foi perguntado, pontos altos proporcionais à profundidade.
 - Decisão perigosa → penalize fortemente Segurança do Cliente.
 - Fase de Fundamentação: espere articulação entre achados e teoria. Narre a reação do preceptor.
 - Fase de Conduta: narre consequências da decisão — paciente reage, preceptor avalia.
