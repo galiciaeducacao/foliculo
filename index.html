@@ -547,6 +547,7 @@ a { color: var(--accent); text-decoration: none; }
     <div class="tutorial-step active"></div>
     <div class="tutorial-step"></div>
     <div class="tutorial-step"></div>
+    <div class="tutorial-step"></div>
   </div>
   <button class="btn-primary" onclick="showScreen('tutorial2')">Continuar →</button>
 </div>
@@ -567,6 +568,7 @@ a { color: var(--accent); text-decoration: none; }
     <div class="tutorial-step done"></div>
     <div class="tutorial-step active"></div>
     <div class="tutorial-step"></div>
+    <div class="tutorial-step"></div>
   </div>
   <button class="btn-primary" onclick="showScreen('tutorial3')">Continuar →</button>
   <br><br>
@@ -575,8 +577,62 @@ a { color: var(--accent); text-decoration: none; }
 </div>
 </div>
 
-<!-- ============ SCREEN: TUTORIAL 3 ============ -->
+<!-- ============ SCREEN: TUTORIAL 3 — ARTICULAÇÃO ============ -->
 <div id="tutorial3" class="screen">
+<div class="tutorial-wrap">
+<div class="tutorial-card">
+  <span class="tutorial-icon">✍️</span>
+  <h1>Como responder</h1>
+  <p class="subtitle">Especificidade é o que separa uma resposta boa de uma medíocre</p>
+  <p>Em cada turno, você escreve em texto livre o que vai fazer. <strong>A riqueza da narrativa e a sua pontuação dependem diretamente do quanto você articula</strong>. Nomear apenas o instrumento ("farei uma anamnese", "vou examinar o couro") rende pouco — a paciente responde com o óbvio e você sai do turno com pouca informação.</p>
+  <p>O que uma resposta <strong>articulada</strong> contém:</p>
+  <p style="margin-left:12px;">• <strong>O que</strong> você vai investigar — os eixos concretos (cronologia, gatilhos, histórico familiar, padrão de distribuição...)</p>
+  <p style="margin-left:12px;">• <strong>Por que</strong> — qual hipótese ou conceito motiva aquela investigação</p>
+  <p style="margin-left:12px;">• <strong>Como</strong> — em que ordem, com que instrumento, buscando que sinal específico</p>
+  <p style="margin-top:12px;"><em>Exemplo fraco:</em> "Farei uma anamnese para entender gatilhos."</p>
+  <p><em>Exemplo forte:</em> "Anamnese dirigida: cronologia da queda e padrão de distribuição, episódios de estresse ou doença nos últimos 3-6 meses, uso atual ou recente de anticoncepcional, histórico familiar de alopecia, e alterações alimentares. Quero rastrear eflúvio telógeno vs padrão androgenético."</p>
+  <p style="margin-top:12px;">A segunda resposta rende muito mais — em pontos e em informação recebida.</p>
+  <div class="tutorial-steps">
+    <div class="tutorial-step done"></div>
+    <div class="tutorial-step done"></div>
+    <div class="tutorial-step active"></div>
+    <div class="tutorial-step"></div>
+  </div>
+  <button class="btn-primary" onclick="showScreen('tutorial4')">Continuar →</button>
+  <br><br>
+  <button class="btn-secondary" onclick="showScreen('tutorial2')">← Voltar</button>
+</div>
+</div>
+</div>
+
+<!-- ============ SCREEN: TUTORIAL 4 — AVALIAÇÃO ============ -->
+<div id="tutorial4" class="screen">
+<div class="tutorial-wrap">
+<div class="tutorial-card">
+  <span class="tutorial-icon">📊</span>
+  <h1>Avaliação</h1>
+  <p class="subtitle">Quatro indicadores guiam seu desempenho</p>
+  <p><strong>🔵 Acurácia Observacional</strong> — Você investiga com método? Direciona a investigação com especificidade?</p>
+  <p><strong>🟤 Fundamentação Biológica</strong> — Suas hipóteses se ancoram na anatomia do folículo, no ciclo capilar e na fisiologia estudada?</p>
+  <p><strong>🟢 Segurança do Cliente</strong> — Você reconhece quando encaminhar? Evita condutas que excedam seu escopo profissional?</p>
+  <p><strong>🟠 Conduta Profissional</strong> — Sua comunicação é clara, ética e adequada ao contexto clínico?</p>
+  <p style="margin-top:12px;">Os indicadores começam zerados (Segurança começa em 50) e se acumulam turno a turno conforme você acerta. A cada turno, <strong>cada resposta ao final traz um feedback explicando o que você fez bem e o que faltou articular melhor</strong>.</p>
+  <p>Se seu desempenho ficar sistematicamente abaixo do mínimo esperado, a simulação encerra.</p>
+  <div class="tutorial-steps">
+    <div class="tutorial-step done"></div>
+    <div class="tutorial-step done"></div>
+    <div class="tutorial-step done"></div>
+    <div class="tutorial-step active"></div>
+  </div>
+  <button class="btn-primary" onclick="showScreen('difficulty')">Iniciar simulação →</button>
+  <br><br>
+  <button class="btn-secondary" onclick="showScreen('tutorial3')">← Voltar</button>
+</div>
+</div>
+</div>
+
+<!-- ============ SCREEN: TUTORIAL 3 (OLD — replaced above) ============ -->
+<div id="tutorial3_old" class="screen" style="display:none;">
 <div class="tutorial-wrap">
 <div class="tutorial-card">
   <span class="tutorial-icon">📊</span>
