@@ -655,23 +655,23 @@ a { color: var(--accent); text-decoration: none; }
   <div class="indicators-row" id="indicatorsRow">
     <div class="indicator-card">
       <div class="ind-label">Acurácia Observacional</div>
-      <div class="ind-value" id="ind1val">65</div>
-      <div class="ind-bar"><div class="ind-fill" id="ind1bar" style="width:65%"></div></div>
+      <div class="ind-value" id="ind1val">0</div>
+      <div class="ind-bar"><div class="ind-fill" id="ind1bar" style="width:0%"></div></div>
     </div>
     <div class="indicator-card">
       <div class="ind-label">Fundamentação Biológica</div>
-      <div class="ind-value" id="ind2val">65</div>
-      <div class="ind-bar"><div class="ind-fill" id="ind2bar" style="width:65%"></div></div>
+      <div class="ind-value" id="ind2val">0</div>
+      <div class="ind-bar"><div class="ind-fill" id="ind2bar" style="width:0%"></div></div>
     </div>
     <div class="indicator-card">
       <div class="ind-label">Segurança do Cliente</div>
-      <div class="ind-value" id="ind3val">65</div>
-      <div class="ind-bar"><div class="ind-fill" id="ind3bar" style="width:65%"></div></div>
+      <div class="ind-value" id="ind3val">50</div>
+      <div class="ind-bar"><div class="ind-fill" id="ind3bar" style="width:50%"></div></div>
     </div>
     <div class="indicator-card">
       <div class="ind-label">Conduta Profissional</div>
-      <div class="ind-value" id="ind4val">65</div>
-      <div class="ind-bar"><div class="ind-fill" id="ind4bar" style="width:65%"></div></div>
+      <div class="ind-value" id="ind4val">0</div>
+      <div class="ind-bar"><div class="ind-fill" id="ind4bar" style="width:0%"></div></div>
     </div>
   </div>
 
@@ -691,15 +691,15 @@ a { color: var(--accent); text-decoration: none; }
     <div class="main-card-body">
       <div class="narrative-box" id="narrativeBox">Carregando caso clínico...</div>
 
-      <!-- Investigation toggle (observation phase) -->
+      <!-- Investigation toggle (observation phase) — SINGLE SELECT, tracks used -->
       <div class="toggle-group" id="investigationToggle" style="display:none;">
-        <label>Tipo de investigação</label>
-        <div class="toggle-options">
-          <button class="toggle-opt" data-val="anamnese" onclick="toggleSelect(this,'investigation')">📝 Anamnese</button>
-          <button class="toggle-opt" data-val="visual" onclick="toggleSelect(this,'investigation')">👁️ Exame visual</button>
-          <button class="toggle-opt" data-val="haste" onclick="toggleSelect(this,'investigation')">🔬 Análise da haste</button>
-          <button class="toggle-opt" data-val="palpacao" onclick="toggleSelect(this,'investigation')">🤚 Palpação do couro</button>
-          <button class="toggle-opt" data-val="tração" onclick="toggleSelect(this,'investigation')">💇 Teste de tração</button>
+        <label>Escolha UMA investigação para este turno</label>
+        <div class="toggle-options" id="investigationOptions">
+          <button class="toggle-opt" data-val="anamnese" onclick="selectInvestigation(this)">📝 Anamnese</button>
+          <button class="toggle-opt" data-val="visual" onclick="selectInvestigation(this)">👁️ Exame visual</button>
+          <button class="toggle-opt" data-val="haste" onclick="selectInvestigation(this)">🔬 Análise da haste</button>
+          <button class="toggle-opt" data-val="palpacao" onclick="selectInvestigation(this)">🤚 Palpação do couro</button>
+          <button class="toggle-opt" data-val="tracao" onclick="selectInvestigation(this)">💇 Teste de tração</button>
         </div>
       </div>
 
@@ -717,7 +717,7 @@ a { color: var(--accent); text-decoration: none; }
       <!-- Response -->
       <div class="response-area">
         <label id="responseLabel">Sua análise</label>
-        <textarea class="response-textarea" id="responseText" placeholder="Descreva sua análise com pelo menos 50 palavras..." oninput="updateCharCount()"></textarea>
+        <textarea class="response-textarea" id="responseText" placeholder="Descreva sua análise de forma detalhada e precisa..." oninput="updateCharCount()"></textarea>
         <div class="char-counter" id="charCounter">0 palavras</div>
       </div>
 
@@ -823,10 +823,11 @@ let STATE = {
   turn: 0,
   phase: 0,
   turnInPhase: 0,
-  indicators: { acuracia: 65, fundamentacao: 65, seguranca: 65, conduta: 65 },
+  indicators: { acuracia: 0, fundamentacao: 0, seguranca: 50, conduta: 0 },
   history: [],
   narrative: '',
   consultantUsed: [],
+  usedInvestigations: [],
   gameOver: false,
   hardFail: false,
   seed: Math.floor(Math.random() * 999999)
@@ -835,17 +836,27 @@ let STATE = {
 // ===================== SYSTEM PROMPT =====================
 function buildSystemPrompt() {
   const lvl = LEVEL_CONFIG[STATE.level];
+  // Points per turn by level
+  const pointsPerTurn = { junior: 25, pleno: 17, senior: 11 };
+  const pts = pointsPerTurn[STATE.level];
+  const criticalThreshold = Math.round(pts * STATE.turn * 0.5); // 50% of points in play so far
+
   return `Você é o narrador imersivo do simulador "Folículo". Sua função é criar a experiência de um atendimento real em uma clínica-escola de tricologia.
 
 VOZ NARRATIVA — REGRA INVIOLÁVEL:
-Narre SEMPRE em segunda pessoa, no presente, como se o aluno estivesse vivendo a cena naquele instante. Você é a voz do ambiente clínico — descreva o que o profissional vê, ouve, sente ao toque, o que o paciente diz em discurso direto.
+Narre SEMPRE em segunda pessoa, no presente, como se o profissional estivesse vivendo a cena naquele instante. Você é a voz do ambiente clínico — descreva o que o profissional vê, ouve, sente ao toque, o que o paciente diz em discurso direto.
 - CERTO: "Você separa as mechas na região temporal e observa que o couro cabeludo está eritematoso. Marina faz uma careta: 'Dói quando você aperta aí.'"
 - CERTO: "Ao realizar o teste de tração, três fios se soltam facilmente. As raízes têm formato de clava esbranquiçada — fios telógenos."
-- CERTO: "Sua escolha de investigar a haste com dermatoscopia revela cutículas danificadas e pontos de fratura ao longo do córtex."
 - ERRADO: "O aluno escolheu fazer anamnese..." / "O estudante escreveu que..." / "A resposta do aluno demonstra..."
 - ERRADO: Qualquer menção a "aluno", "estudante", "resposta", "simulação", "turno", "indicadores" dentro da narrativa.
+Nunca quebre a imersão dentro da narrativa. A narrativa é 100% diegética — só existe o consultório, o paciente, e o que acontece ali.
 
-Nunca quebre a imersão. Nunca comente sobre a qualidade da resposta dentro da narrativa. O feedback pedagógico é dado EXCLUSIVAMENTE pelos indicadores numéricos (que o aluno vê na interface). A narrativa é 100% diegética — só existe o consultório, o paciente, e o que acontece ali.
+FEEDBACK PEDAGÓGICO:
+Ao FINAL da narrativa, SEMPRE adicione um parágrafo separado começando com "📝 Feedback:" seguido de uma avaliação direta e construtiva da conduta do profissional naquele turno. Exemplos:
+- "📝 Feedback: Você seguiu o caminho correto ao priorizar a anamnese antes do exame visual. A investigação sobre histórico hormonal e estresse recente foi pertinente e cobriu os principais gatilhos. Faltou explorar o histórico familiar de alopecia."
+- "📝 Feedback: Sua abordagem considerou diversos aspectos relevantes, mas ficaram faltando pontos críticos: você não investigou a duração da queda nem a presença de dor ou prurido, que são essenciais para o diagnóstico diferencial."
+- "📝 Feedback: Você deixou de fora os principais aspectos da investigação. Uma anamnese em tricologia precisa obrigatoriamente incluir: início e duração da queda, padrão de distribuição, histórico de estresse/doença nos últimos 3-6 meses, e uso de medicamentos."
+O feedback deve refletir DIRETAMENTE a movimentação dos indicadores. Se os indicadores subiram, o feedback é positivo. Se desceram, aponta o que faltou.
 
 CONTEÚDO DE REFERÊNCIA:
 Tema 1 — ANATOMIA FUNCIONAL DA UNIDADE PILOSSEBÁCEA: folículo como mini-órgão integrado com três segmentos (infundíbulo, istmo, segmento inferior), bulbo (matriz germinativa + papila dérmica como centro instrutivo + melanócitos), bainhas radiculares (interna: cutícula/Huxley/Henle; externa: contínua, abriga o bulge), bulge (células-tronco CK15/CK19/CD200, renovação folicular, reepitelização), glândula sebácea (holócrina, sebo), músculo eretor, vascularização da papila, inervação sensorial+autonômica, embriogênese por interações epitelial-mesenquimais. Conceitos-chave: papila dérmica como centro instrutivo (se removida→sem pelo; se transplantada→induz folículo novo), transplante capilar funciona porque carrega toda a unidade, queimadura profunda destrói bulge→alopecia cicatricial definitiva, distinção cicatricial (bulge destruído=irreversível) vs não cicatricial (bulge preservado=potencialmente reversível), fibroblastos da papila perdem propriedades indutoras em cultura 2D.
@@ -858,23 +869,60 @@ Nível: ${lvl.label} (${lvl.turns} turnos)
 Fases: Observação (${lvl.phases[0]} turnos) → Fundamentação (${lvl.phases[1]} turnos) → Conduta (${lvl.phases[2]} turnos)
 Seed: ${STATE.seed} — use para gerar um caso ÚNICO. Varie: idade, sexo, etnia, tipo de queixa, gravidade, presença/ausência de sinais de alarme, contexto hormonal/emocional/nutricional.
 
-INDICADORES (começam em 65, escala 0-100, delta máx ±15/turno):
-1. Acurácia Observacional — investiga com método? Seleciona exames relevantes?
-2. Fundamentação Biológica — ancora hipóteses na anatomia e no ciclo capilar?
-3. Segurança do Cliente — reconhece limites? Encaminha quando necessário?
-4. Conduta Profissional — comunicação clara, ética, contextualizada?
+SISTEMA DE PONTUAÇÃO:
+Indicadores iniciais: Acurácia Observacional = 0, Fundamentação Biológica = 0, Conduta Profissional = 0, Segurança do Cliente = 50 (o paciente já veio buscar ajuda profissional).
 
-REGRAS:
-- Resposta vaga/curta do profissional → descreva consequências negativas NA CENA (ex: o paciente fica inseguro, você perde informação importante). Penalize nos indicadores. NUNCA complete pelo profissional.
-- Decisão perigosa (ex: tratar alopecia cicatricial sem encaminhar) → penalize FORTEMENTE Segurança do Cliente.
-- Indicador zerou → game_over + hard_fail. Narre o desfecho clínico negativo.
-- Fase de Observação: o profissional informa o tipo de investigação (anamnese, exame visual, análise da haste, palpação, teste de tração). Revele informações clínicas coerentes com o método escolhido. Se ele não investigar algo relevante, a informação simplesmente não aparece.
-- Fase de Fundamentação: espere articulação entre achados e teoria. Narre a reação do supervisor/preceptor da clínica-escola ao raciocínio.
-- Fase de Conduta: narre as consequências da decisão tomada — o paciente reage, o preceptor avalia.
+TODOS OS 4 INDICADORES SÃO AVALIADOS EM TODOS OS TURNOS.
+Cada turno, atribua pontos a CADA um dos 4 indicadores. Use estas faixas concretas:
+
+Fase de Observação — ênfase em Acurácia:
+- Acurácia Observacional: 0 a ${pts} pts (foco principal — investigou bem? priorizou o método certo?)
+- Fundamentação Biológica: 0 a ${Math.round(pts * 0.6)} pts (demonstrou saber o que procura? usou termos corretos?)
+- Conduta Profissional: 0 a ${Math.round(pts * 0.6)} pts (acolheu o paciente? comunicou? linguagem adequada?)
+- Segurança do Cliente: 0 a ${Math.round(pts * 0.4)} pts (condução segura? se fizer algo perigoso, SUBTRAIA até -${pts})
+
+Fase de Fundamentação — ênfase em Fundamentação:
+- Acurácia Observacional: 0 a ${Math.round(pts * 0.3)} pts
+- Fundamentação Biológica: 0 a ${pts} pts (foco principal — articulou achados com anatomia/ciclo?)
+- Conduta Profissional: 0 a ${Math.round(pts * 0.6)} pts (explicou de forma clara e ética?)
+- Segurança do Cliente: 0 a ${Math.round(pts * 0.5)} pts (raciocínio leva a conclusão segura?)
+
+Fase de Conduta — ênfase em Conduta e Segurança:
+- Acurácia Observacional: 0 a ${Math.round(pts * 0.2)} pts
+- Fundamentação Biológica: 0 a ${Math.round(pts * 0.3)} pts
+- Conduta Profissional: 0 a ${pts} pts (foco principal — decisão concreta, justificada, ética?)
+- Segurança do Cliente: 0 a ${pts} pts (encaminhou quando devia? evitou risco? se prejudicou, SUBTRAIA até -${pts})
+
+REGRA DE OURO: Os indicadores são ACUMULATIVOS (somam a cada turno). No JSON de resposta, informe o TOTAL acumulado até o momento, NÃO apenas os pontos do turno atual.
+Exemplo: se no turno 1 Acurácia recebeu 20, e no turno 2 recebeu mais 22, o valor no JSON do turno 2 deve ser 42.
+Se o profissional fez algo que merece SUBTRAÇÃO (como prescrever medicamento sem habilitação), subtraia do total acumulado.
+
+META: ${lvl.turns} turnos bem jogados devem levar próximo de 100 em cada indicador. Segurança começa em 50 e pode chegar perto de 100 com boas decisões.
+
+REGRA DE ERRO CRÍTICO:
+Após cada turno (a partir do turno 2), calcule a média dos 4 indicadores. Se a média geral estiver abaixo de 25% do máximo acumulável até aquele ponto, é ERRO CRÍTICO → game_over: true, hard_fail: true.
+Máximo acumulável no turno atual: Acurácia/Fundamentação/Conduta = ${pts} × turnos jogados. Segurança = 50 + ${pts} × turnos jogados.
+
+DOSAGEM DE INFORMAÇÃO — REGRA FUNDAMENTAL:
+Na Observação, o profissional escolhe UMA ÚNICA investigação por turno. Revele SOMENTE o que aquele método revelaria:
+- Anamnese → queixa, cronologia, gatilhos (estresse, doença, medicação), histórico familiar, hábitos. NÃO descreva achados visuais ou de toque.
+- Exame visual → o que se VÊ: distribuição da queda, densidade, rarefação, coloração do couro. NÃO inclua informações de anamnese.
+- Análise da haste → diâmetro, elasticidade, fragilidade, cutícula, pontos de fratura.
+- Palpação do couro → textura, temperatura, nódulos, dor, elasticidade.
+- Teste de tração → quantos fios se soltam, regiões, aspecto das raízes (telógena/anágena/distrófica).
+NUNCA misture achados de métodos diferentes. Se o profissional só fez anamnese, ele NÃO VÊ resultado de teste de tração.
+Ao final de cada turno de Observação, lance um próximo desafio que motive a escolha da próxima investigação.
+
+REGRAS ADICIONAIS:
+- NÃO há mínimo de palavras. Julgue pela QUALIDADE e PROFUNDIDADE.
+- Resposta vaga → descreva consequências negativas NA CENA. Dê poucos pontos. O feedback explica o que faltou.
+- Decisão perigosa → penalize fortemente Segurança do Cliente.
+- Fase de Fundamentação: espere articulação entre achados e teoria. Narre a reação do preceptor.
+- Fase de Conduta: narre consequências da decisão — paciente reage, preceptor avalia.
 
 FORMATO DE RESPOSTA (JSON estrito, sem markdown, sem texto fora do JSON):
 {
-  "narrativa": "Narração imersiva em segunda pessoa, presente. Máximo 300 palavras. Português brasileiro.",
+  "narrativa": "Narração imersiva em segunda pessoa + parágrafo final de feedback (📝 Feedback: ...). Máximo 400 palavras. Português brasileiro.",
   "indicadores": { "acuracia": N, "fundamentacao": N, "seguranca": N, "conduta": N },
   "modulos_revisar": ["conceito a revisar se aplicável"],
   "game_over": false,
@@ -883,40 +931,114 @@ FORMATO DE RESPOSTA (JSON estrito, sem markdown, sem texto fora do JSON):
 }
 
 Último turno → game_over: true + diagnostico_final preenchido.
-Primeiro turno → apresente o paciente entrando na sala. Aparência, queixa em discurso direto, primeiras observações visuais. NÃO revele diagnóstico.`;
+Primeiro turno → apresente o paciente entrando na sala. Aparência, queixa em discurso direto, primeiras observações visuais. NÃO revele diagnóstico. NÃO inclua feedback no primeiro turno (é só apresentação do caso).`;
 }
 
-// ===================== SAFE STORAGE (cookie-based) =====================
-// Uses cookies instead of localStorage so it works inside cross-origin iframes
-// where third-party storage is blocked by modern browsers.
+// ===================== PERSISTENT STORAGE (IndexedDB) =====================
+// IndexedDB works inside cross-origin iframes where localStorage and cookies
+// are blocked. It's async, so we use a memory cache for synchronous reads
+// and flush to IDB on writes.
+const _memCache = {};
+let _db = null;
+
+function _openDB() {
+  return new Promise((resolve, reject) => {
+    if (_db) return resolve(_db);
+    try {
+      const req = indexedDB.open('foliculo_db', 1);
+      req.onupgradeneeded = (e) => { e.target.result.createObjectStore('kv'); };
+      req.onsuccess = (e) => { _db = e.target.result; resolve(_db); };
+      req.onerror = () => resolve(null);
+    } catch(e) { resolve(null); }
+  });
+}
+
+async function _idbGet(key) {
+  const db = await _openDB();
+  if (!db) return null;
+  return new Promise((resolve) => {
+    try {
+      const tx = db.transaction('kv', 'readonly');
+      const req = tx.objectStore('kv').get(key);
+      req.onsuccess = () => resolve(req.result ?? null);
+      req.onerror = () => resolve(null);
+    } catch(e) { resolve(null); }
+  });
+}
+
+async function _idbSet(key, value) {
+  const db = await _openDB();
+  if (!db) return;
+  try {
+    const tx = db.transaction('kv', 'readwrite');
+    tx.objectStore('kv').put(value, key);
+  } catch(e) {}
+}
+
+async function _idbRemove(key) {
+  const db = await _openDB();
+  if (!db) return;
+  try {
+    const tx = db.transaction('kv', 'readwrite');
+    tx.objectStore('kv').delete(key);
+  } catch(e) {}
+}
+
+// Synchronous read from cache (populated at init)
 function storageGet(key) {
+  if (_memCache[key] !== undefined) return _memCache[key];
+  // Fallback: try localStorage
+  try { const v = localStorage.getItem(key); if (v !== null) return v; } catch(e) {}
+  // Fallback: try cookie
   try {
-    // Try localStorage first
-    const ls = localStorage.getItem(key);
-    if (ls !== null) return ls;
+    const m = document.cookie.match(new RegExp('(?:^|; )' + encodeURIComponent(key) + '=([^;]*)'));
+    if (m) return decodeURIComponent(m[1]);
   } catch(e) {}
-  // Fallback to cookies
-  try {
-    const match = document.cookie.match(new RegExp('(?:^|; )' + encodeURIComponent(key) + '=([^;]*)'));
-    return match ? decodeURIComponent(match[1]) : null;
-  } catch(e) { return null; }
+  return null;
 }
 
+// Async write to all available backends
 function storageSet(key, value) {
-  // Try localStorage
+  _memCache[key] = value;
+  _idbSet(key, value);
   try { localStorage.setItem(key, value); } catch(e) {}
-  // Always also set cookie (365 days, works in iframes)
-  try {
-    const expires = new Date(Date.now() + 365*24*60*60*1000).toUTCString();
-    document.cookie = encodeURIComponent(key) + '=' + encodeURIComponent(value) + '; expires=' + expires + '; path=/; SameSite=None; Secure';
-  } catch(e) {}
+  // Cookie only for small values (daily block)
+  if (value.length < 200) {
+    try {
+      const exp = new Date(Date.now() + 365*24*60*60*1000).toUTCString();
+      document.cookie = encodeURIComponent(key) + '=' + encodeURIComponent(value) + '; expires=' + exp + '; path=/; SameSite=None; Secure';
+      document.cookie = encodeURIComponent(key) + '=' + encodeURIComponent(value) + '; expires=' + exp + '; path=/; SameSite=Lax';
+      document.cookie = encodeURIComponent(key) + '=' + encodeURIComponent(value) + '; expires=' + exp + '; path=/';
+    } catch(e) {}
+  }
 }
 
 function storageRemove(key) {
+  delete _memCache[key];
+  _idbRemove(key);
   try { localStorage.removeItem(key); } catch(e) {}
-  try {
-    document.cookie = encodeURIComponent(key) + '=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/; SameSite=None; Secure';
-  } catch(e) {}
+  try { document.cookie = encodeURIComponent(key) + '=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/'; } catch(e) {}
+}
+
+// Preload cache from IndexedDB before init
+async function preloadCache() {
+  const keys = [STORAGE_KEY, 'foliculo_theme', 'foliculo_daily'];
+  for (const key of keys) {
+    const val = await _idbGet(key);
+    if (val !== null) _memCache[key] = val;
+  }
+  // Also pull from localStorage/cookie into cache if IDB was empty
+  for (const key of keys) {
+    if (_memCache[key] === undefined) {
+      try { const v = localStorage.getItem(key); if (v !== null) _memCache[key] = v; } catch(e) {}
+    }
+    if (_memCache[key] === undefined) {
+      try {
+        const m = document.cookie.match(new RegExp('(?:^|; )' + encodeURIComponent(key) + '=([^;]*)'));
+        if (m) _memCache[key] = decodeURIComponent(m[1]);
+      } catch(e) {}
+    }
+  }
 }
 
 // ===================== THEME =====================
@@ -955,38 +1077,18 @@ function selectDifficulty(level) {
 }
 
 // ===================== DAILY BLOCK =====================
-// Uses a dedicated lightweight cookie for daily block — always works, even cross-origin
-const DAILY_COOKIE = 'foliculo_daily';
-
-function setDailyCookie() {
-  try {
-    const tomorrow = new Date();
-    tomorrow.setDate(tomorrow.getDate() + 1);
-    tomorrow.setHours(0, 0, 0, 0);
-    const dateStr = new Date().toISOString().split('T')[0]; // e.g. "2026-04-15"
-    // Set with multiple strategies for maximum compatibility
-    document.cookie = DAILY_COOKIE + '=' + dateStr + '; expires=' + tomorrow.toUTCString() + '; path=/; SameSite=None; Secure';
-    document.cookie = DAILY_COOKIE + '=' + dateStr + '; expires=' + tomorrow.toUTCString() + '; path=/; SameSite=Lax';
-    document.cookie = DAILY_COOKIE + '=' + dateStr + '; expires=' + tomorrow.toUTCString() + '; path=/';
-  } catch(e) {}
-}
-
-function getDailyCookie() {
-  try {
-    const match = document.cookie.match(new RegExp('(?:^|; )' + DAILY_COOKIE + '=([^;]*)'));
-    return match ? match[1] : null;
-  } catch(e) { return null; }
-}
+const DAILY_KEY = 'foliculo_daily';
 
 function checkDailyBlock() {
   const today = new Date().toISOString().split('T')[0];
-  const cookieDate = getDailyCookie();
-  if (cookieDate === today) {
+  // Check lightweight daily key
+  const dailyVal = storageGet(DAILY_KEY);
+  if (dailyVal === today) {
     showScreen('dailyblock');
     updateBlockTimer();
     return true;
   }
-  // Also check localStorage as backup
+  // Also check main state
   const data = storageGet(STORAGE_KEY);
   if (!data) return false;
   try {
@@ -1029,8 +1131,13 @@ function checkSession() {
     if (saved.completedDate) return false;
     if (saved.turn > 0 && !saved.gameOver && saved.level) {
       STATE = { ...STATE, ...saved };
+      usedInvestigations = STATE.usedInvestigations || [];
       showScreen('gamescreen');
       renderGameState();
+      // Re-disable used investigation buttons
+      if (usedInvestigations.length > 0) {
+        setTimeout(() => markInvestigationUsed(), 100);
+      }
       return true;
     }
   } catch(e) {}
@@ -1038,9 +1145,9 @@ function checkSession() {
 }
 
 function markDayComplete() {
-  // Set cookie (lightweight, always works)
-  setDailyCookie();
-  // Also save to localStorage as backup
+  // Set lightweight daily key
+  storageSet(DAILY_KEY, new Date().toISOString().split('T')[0]);
+  // Also update main state
   const data = storageGet(STORAGE_KEY);
   let saved = data ? JSON.parse(data) : {};
   saved.completedDate = new Date().toISOString();
@@ -1055,10 +1162,12 @@ function startGame() {
   STATE.turn = 0;
   STATE.phase = 0;
   STATE.turnInPhase = 0;
-  STATE.indicators = { acuracia: 65, fundamentacao: 65, seguranca: 65, conduta: 65 };
+  STATE.indicators = { acuracia: 0, fundamentacao: 0, seguranca: 50, conduta: 0 };
   STATE.history = [];
   STATE.narrative = '';
   STATE.consultantUsed = [];
+  STATE.usedInvestigations = [];
+  usedInvestigations = [];
   STATE.gameOver = false;
   STATE.hardFail = false;
   STATE.seed = Math.floor(Math.random() * 999999);
@@ -1090,6 +1199,20 @@ function renderGameState() {
   document.getElementById('investigationToggle').style.display = STATE.phase === 0 ? 'block' : 'none';
   document.getElementById('frameworkToggle').style.display = STATE.phase === 1 ? 'block' : 'none';
 
+  // Re-apply used investigation states
+  if (STATE.phase === 0 && usedInvestigations.length > 0) {
+    document.querySelectorAll('#investigationOptions .toggle-opt').forEach(btn => {
+      const val = btn.getAttribute('data-val');
+      if (usedInvestigations.includes(val)) {
+        btn.classList.add('used');
+        btn.classList.remove('selected');
+        btn.style.opacity = '0.4';
+        btn.style.textDecoration = 'line-through';
+        btn.style.cursor = 'not-allowed';
+      }
+    });
+  }
+
   // Response label
   const labels = ['Descreva sua investigação','Articule sua fundamentação biológica','Descreva sua conduta e justificativa'];
   document.getElementById('responseLabel').textContent = labels[STATE.phase];
@@ -1107,18 +1230,29 @@ function updateCharCount() {
   const words = text ? text.split(/\s+/).length : 0;
   const counter = document.getElementById('charCounter');
   counter.textContent = `${words} palavra${words !== 1 ? 's' : ''}`;
-  counter.classList.toggle('warning', words < 50 && words > 0);
+  counter.classList.remove('warning');
   updateSubmitState();
 }
 
 function updateSubmitState() {
   const text = document.getElementById('responseText').value.trim();
-  const words = text ? text.split(/\s+/).length : 0;
-  document.getElementById('submitBtn').disabled = words < 50;
+  document.getElementById('submitBtn').disabled = text.length < 1;
 }
 
 // ===================== TOGGLES =====================
 let selectedToggles = { investigation: [], framework: [] };
+let usedInvestigations = []; // tracks which investigations have been used in prior turns
+
+function selectInvestigation(btn) {
+  if (btn.classList.contains('used')) return; // already used in prior turn
+  const val = btn.getAttribute('data-val');
+  // Deselect all others (single-select)
+  document.querySelectorAll('#investigationOptions .toggle-opt').forEach(b => {
+    if (b !== btn) b.classList.remove('selected');
+  });
+  btn.classList.toggle('selected');
+  selectedToggles.investigation = btn.classList.contains('selected') ? [val] : [];
+}
 
 function toggleSelect(btn, group) {
   btn.classList.toggle('selected');
@@ -1131,8 +1265,27 @@ function toggleSelect(btn, group) {
 }
 
 function clearToggles() {
-  document.querySelectorAll('.toggle-opt').forEach(b => b.classList.remove('selected'));
+  document.querySelectorAll('.toggle-opt:not(.used)').forEach(b => b.classList.remove('selected'));
   selectedToggles = { investigation: [], framework: [] };
+}
+
+function markInvestigationUsed() {
+  if (selectedToggles.investigation.length > 0) {
+    const val = selectedToggles.investigation[0];
+    if (!usedInvestigations.includes(val)) usedInvestigations.push(val);
+    STATE.usedInvestigations = [...usedInvestigations];
+  }
+  // Disable used buttons visually
+  document.querySelectorAll('#investigationOptions .toggle-opt').forEach(btn => {
+    const val = btn.getAttribute('data-val');
+    if (usedInvestigations.includes(val)) {
+      btn.classList.add('used');
+      btn.classList.remove('selected');
+      btn.style.opacity = '0.4';
+      btn.style.textDecoration = 'line-through';
+      btn.style.cursor = 'not-allowed';
+    }
+  });
 }
 
 // ===================== API CALL =====================
@@ -1228,8 +1381,7 @@ async function requestFirstTurn() {
 
 async function submitResponse() {
   const text = document.getElementById('responseText').value.trim();
-  const words = text.split(/\s+/).length;
-  if (words < 50) return;
+  if (!text) return;
 
   hideError();
   const cfg = LEVEL_CONFIG[STATE.level];
@@ -1272,6 +1424,7 @@ async function submitResponse() {
     STATE.turnInPhase = nextTurnInPhase;
     applyResult(result);
     document.getElementById('responseText').value = '';
+    if (STATE.phase === 0 || nextPhase === 0) markInvestigationUsed(); // mark before clearing
     clearToggles();
     updateCharCount();
   };
@@ -1308,11 +1461,19 @@ function applyResult(result) {
     STATE.indicators.conduta = clamp(result.indicadores.conduta ?? STATE.indicators.conduta, 0, 100);
   }
 
-  // Check hard fail
-  const anyZero = Object.values(STATE.indicators).some(v => v <= 0);
-  if (anyZero) {
-    STATE.hardFail = true;
-    STATE.gameOver = true;
+  // Check hard fail — average below 25% of max possible after turn 2+
+  if (STATE.turn >= 2) {
+    const pts = { junior: 25, pleno: 17, senior: 11 }[STATE.level];
+    const turnsPlayed = STATE.turn;
+    const maxPerIndicator = pts * turnsPlayed;
+    const maxSeguranca = 50 + maxPerIndicator;
+    const maxTotal = maxPerIndicator * 3 + maxSeguranca; // 3 indicators + segurança
+    const currentTotal = STATE.indicators.acuracia + STATE.indicators.fundamentacao + STATE.indicators.conduta + STATE.indicators.seguranca;
+    
+    if (currentTotal < Math.round(maxTotal * 0.25)) {
+      STATE.hardFail = true;
+      STATE.gameOver = true;
+    }
   }
   if (result.game_over) STATE.gameOver = true;
   if (result.hard_fail) STATE.hardFail = true;
@@ -1336,7 +1497,7 @@ function endGame(result) {
 
   let icon = '📊', verdict = '';
   if (STATE.hardFail) {
-    icon = '⚠️'; verdict = 'Falha crítica — indicador zerou.';
+    icon = '⚠️'; verdict = 'Erro crítico — desempenho abaixo do patamar mínimo aceitável.';
   } else if (avg >= 80) {
     icon = '🏆'; verdict = 'Desempenho excelente — fundamentação sólida e conduta segura.';
   } else if (avg >= 60) {
@@ -1369,13 +1530,22 @@ function endGame(result) {
 }
 
 function resetGame() {
+  // Check if daily block applies — if so, show block screen instead of restarting
+  const today = new Date().toISOString().split('T')[0];
+  const dailyVal = storageGet(DAILY_KEY);
+  if (dailyVal === today) {
+    showScreen('dailyblock');
+    updateBlockTimer();
+    return;
+  }
   storageRemove(STORAGE_KEY);
   STATE = {
     screen: 'tutorial1', level: null, playerName: '', turn: 0, phase: 0, turnInPhase: 0,
-    indicators: { acuracia: 65, fundamentacao: 65, seguranca: 65, conduta: 65 },
-    history: [], narrative: '', consultantUsed: [], gameOver: false, hardFail: false,
+    indicators: { acuracia: 0, fundamentacao: 0, seguranca: 50, conduta: 0 },
+    history: [], narrative: '', consultantUsed: [], usedInvestigations: [], gameOver: false, hardFail: false,
     seed: Math.floor(Math.random() * 999999)
   };
+  usedInvestigations = [];
   showScreen('difficulty');
 }
 
@@ -1464,8 +1634,15 @@ h1{font-family:'Playfair Display',Georgia,serif;color:#6B4226}h2{color:#5C5347;b
 }
 
 // ===================== INIT =====================
-(function init() {
+(async function init() {
   try {
+    await preloadCache();
+    // Apply theme from cache
+    const t = storageGet('foliculo_theme');
+    if (t === 'dark') {
+      document.documentElement.setAttribute('data-theme','dark');
+      document.querySelector('.theme-toggle').textContent = '☀️';
+    }
     if (checkDailyBlock()) return;
     if (checkSession()) return;
   } catch(e) {
