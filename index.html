@@ -1,1788 +1,1831 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
+<!-- ACTIVE-IA-QA-SEAL
+  simulator_id: saunut-m01-consulta-comportamental
+  qa_date: 2026-07-02
+  model_calibration: claude-sonnet-4-6
+  criteria_passed: pending-run
+  core_version: 1.4.0
+  status: partial
+-->
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Folículo — Simulador de Raciocínio Tricológico</title>
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>A Consulta · Nutrição Comportamental · Active IA Galícia</title>
+<meta name="description" content="Simulador de consulta nutricional comportamental — Active IA, Escola de Saúde Galícia. Módulo 01 — Fundamentos da Nutrição Comportamental.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=Source+Sans+3:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
+<!-- CSS do core (framework v1.3) -->
+<link rel="stylesheet" href="https://galiciaeducacao.github.io/activeia-core/v1.3/core.v1_3.css">
+
+<!-- Tema visual A Consulta — consultório íntimo de nutrição comportamental
+     Paleta Galícia INTOCADA no chassi + verde-sábio/creme como acento contextual -->
 <style>
-/* ===================== DESIGN TOKENS ===================== */
 :root {
-  --bg-base: #F5F0EA;
-  --bg-surface: #FFFFFF;
-  --bg-surface-alt: #EDE8E0;
-  --bg-elevated: #FDFBF8;
-  --text-primary: #1E1A14;
-  --text-secondary: #5C5347;
-  --text-muted: #8F8478;
-  --text-inverse: #FDFBF8;
-  --border: #D9D0C4;
-  --border-subtle: #E8E1D6;
-  --accent: #6B4226;
-  --accent-light: #F3ECE4;
-  --accent-hover: #8A5A3A;
-  --accent-text: #FFFFFF;
-  --success: #2D7A4F;
-  --success-light: #E6F4EC;
-  --warning: #B8860B;
-  --warning-light: #FDF5E0;
-  --danger: #A93226;
-  --danger-light: #FDECEA;
-  --info: #2E6B8A;
-  --info-light: #E8F1F5;
-  --indicator-1: #2E6B8A;
-  --indicator-2: #6B4226;
-  --indicator-3: #2D7A4F;
-  --indicator-4: #8B5E3C;
-  --phase-color: var(--accent);
-  --shadow-xs: 0 1px 2px rgba(30,26,20,0.04);
-  --shadow-sm: 0 2px 6px rgba(30,26,20,0.06);
-  --shadow-md: 0 4px 16px rgba(30,26,20,0.08);
-  --shadow-lg: 0 8px 32px rgba(30,26,20,0.1);
-  --radius-sm: 6px;
-  --radius-md: 10px;
-  --radius-lg: 16px;
-  --radius-xl: 24px;
-  --radius-full: 9999px;
-  --font-display: 'Playfair Display', Georgia, serif;
-  --font-body: 'Source Sans 3', -apple-system, sans-serif;
-  --font-mono: 'Fira Code', monospace;
-  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
-  --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+  /* Backgrounds — creme claro e branco de consultório */
+  --gal-bg-base: #FAF7F2;
+  --gal-bg-elev: #FFFFFF;
+  --gal-bg-card: #F5F1EA;
+  --gal-bg-deep: #ECE5D9;
+  --gal-bg-hero: #0a1628;
+
+  /* Textos — navy institucional */
+  --gal-text-1: #0a1628;
+  --gal-text-2: #2c3e50;
+  --gal-text-3: #7f8b98;
+  --gal-text-inv: #FAF7F2;
+
+  /* Cor primária — cyan Galícia */
+  --gal-primary: #0074C7;
+  --gal-primary-hover: #005a9c;
+  --gal-primary-soft: #D6EEFC;
+  --gal-primary-text: #FFFFFF;
+
+  /* Acento — verde-sábio (símbolo do cuidado não moralizante, natureza) */
+  --gal-accent: #6E8E5A;
+  --gal-accent-soft: #E1EAD4;
+
+  /* Tons semânticos */
+  --gal-success: #4A7C59;
+  --gal-success-soft: #DDEBE0;
+  --gal-warning: #C97C3D;
+  --gal-warning-soft: #F5E2D0;
+  --gal-danger: #B53D3D;
+  --gal-danger-soft: #F5D6D6;
+  --gal-info: #0074C7;
+  --gal-info-soft: #D6EEFC;
+
+  /* Borders */
+  --gal-border: #D9D0BF;
+  --gal-border-soft: #E8DDCB;
+
+  /* Dossier specific */
+  --gal-dossier-hero-bg: #0a1628;
+  --gal-dossier-hero-text: #FAF7F2;
+  --gal-dossier-hero-eyebrow: #00BDFF;
+  --gal-dossier-recommendation-bg: #2c3e50;
+
+  /* Scene card */
+  --gal-scene-bg: #FFFFFF;
+  --gal-scene-border: #D9D0BF;
+  --gal-scene-eyebrow: #0074C7;
+
+  /* Pill strip */
+  --gal-pill-bg: #F5F1EA;
+  --gal-pill-border: #D9D0BF;
+  --gal-pill-text: #2c3e50;
+  --gal-pill-warning-bg: #F5E2D0;
+  --gal-pill-warning-border: #C97C3D;
+  --gal-pill-warning-text: #7c4a1f;
+
+  /* Boot — navy institucional Galícia */
+  --gal-boot-bg: #0a1628;
+  --gal-boot-text: #FAF7F2;
+  --gal-boot-eyebrow: #00BDFF;
+  --gal-boot-bar: #0074C7;
+
+  /* Daily block */
+  --gal-daily-bg: #0a1628;
+  --gal-daily-text: #FAF7F2;
+  --gal-daily-eyebrow: #00BDFF;
+  --gal-daily-clock: #91F2FF;
+
+  /* Indicators */
+  --gal-indicator-bar-bg: #ECE5D9;
+  --gal-indicator-bar-fill: #0074C7;
+
+  /* Buttons */
+  --gal-btn-primary-bg: #0074C7;
+  --gal-btn-primary-bg-hover: #005a9c;
+  --gal-btn-primary-text: #FFFFFF;
+  --gal-btn-secondary-bg: transparent;
+  --gal-btn-secondary-border: #0074C7;
+  --gal-btn-secondary-text: #0074C7;
+
+  /* Fontes — Gotham (proprietária) → Montserrat → system-ui.
+     REGRA GALÍCIA v3.1: zero serifas, zero monoespaçadas em qualquer texto. */
+  --font-display: 'Gotham', 'Montserrat', system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+  --font: 'Gotham', 'Montserrat', system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-mono: 'Gotham', 'Montserrat', system-ui, sans-serif;
 }
 
 [data-theme="dark"] {
-  --bg-base: #141210;
-  --bg-surface: #1E1B18;
-  --bg-surface-alt: #282420;
-  --bg-elevated: #322D28;
-  --text-primary: #EDE8E0;
-  --text-secondary: #A89D90;
-  --text-muted: #736860;
-  --text-inverse: #1E1A14;
-  --border: #3A3530;
-  --border-subtle: #2E2A26;
-  --accent: #C4956A;
-  --accent-light: #2A2218;
-  --accent-hover: #D4A87A;
-  --accent-text: #1E1A14;
-  --success: #5AAF82;
-  --success-light: #1A2E22;
-  --warning: #D4A030;
-  --warning-light: #2A2418;
-  --danger: #E05A4E;
-  --danger-light: #2E1C1A;
-  --info: #5A9BBF;
-  --info-light: #1A2830;
-  --indicator-1: #5A9BBF;
-  --indicator-2: #C4956A;
-  --indicator-3: #5AAF82;
-  --indicator-4: #D4A87A;
-  --shadow-xs: 0 1px 2px rgba(0,0,0,0.2);
-  --shadow-sm: 0 2px 6px rgba(0,0,0,0.25);
-  --shadow-md: 0 4px 16px rgba(0,0,0,0.3);
-  --shadow-lg: 0 8px 32px rgba(0,0,0,0.35);
-}
+  --gal-bg-base: #0a1628;
+  --gal-bg-elev: #142238;
+  --gal-bg-card: #1a2c45;
+  --gal-bg-deep: #05101f;
+  --gal-bg-hero: #030812;
 
-/* ===================== RESET & BASE ===================== */
-*, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
-html { font-size: 16px; -webkit-text-size-adjust: 100%; }
-body {
-  font-family: var(--font-body);
-  background: var(--bg-base);
-  color: var(--text-primary);
-  line-height: 1.6;
-  min-height: 100vh;
-  overflow-x: hidden;
-}
-button { font-family: inherit; cursor: pointer; border: none; background: none; }
-input, textarea, select { font-family: inherit; }
-a { color: var(--accent); text-decoration: none; }
+  --gal-text-1: #FAF7F2;
+  --gal-text-2: #C9D5E3;
+  --gal-text-3: #7f8b98;
+  --gal-text-inv: #0a1628;
 
-/* ===================== UTILITY ===================== */
-.sr-only { position:absolute; width:1px; height:1px; overflow:hidden; clip:rect(0,0,0,0); }
+  --gal-primary: #00BDFF;
+  --gal-primary-hover: #33CBFF;
+  --gal-primary-soft: #0d3050;
 
-/* ===================== THEME TOGGLE ===================== */
-.theme-toggle {
-  position: fixed; top: 16px; right: 16px; z-index: 1000;
-  width: 40px; height: 40px; border-radius: var(--radius-full);
-  background: var(--bg-surface); border: 1px solid var(--border);
-  display: flex; align-items: center; justify-content: center;
-  box-shadow: var(--shadow-sm); transition: all 0.3s var(--ease-out);
-  font-size: 18px;
-}
-.theme-toggle:hover { transform: scale(1.1); box-shadow: var(--shadow-md); }
+  --gal-accent: #91B87A;
+  --gal-accent-soft: #2a3a1f;
 
-/* ===================== SCREENS ===================== */
-.screen { display: none; animation: fadeIn 0.5s var(--ease-out); }
-.screen.active { display: block; }
-@keyframes fadeIn { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
+  --gal-border: #2c3e50;
+  --gal-border-soft: #1a2c45;
 
-/* ===================== TUTORIAL ===================== */
-.tutorial-wrap {
-  min-height: 100vh; display: flex; align-items: center; justify-content: center;
-  padding: 24px;
-  background: linear-gradient(160deg, var(--bg-base) 0%, var(--bg-surface-alt) 100%);
-}
-.tutorial-card {
-  max-width: 560px; width: 100%;
-  background: var(--bg-surface); border-radius: var(--radius-lg);
-  padding: 48px 40px; box-shadow: var(--shadow-lg);
-  text-align: center; position: relative; overflow: hidden;
-}
-.tutorial-card::before {
-  content: ''; position: absolute; top: 0; left: 0; right: 0; height: 4px;
-  background: linear-gradient(90deg, var(--accent), var(--success), var(--info));
-}
-.tutorial-icon { font-size: 56px; margin-bottom: 20px; display: block; }
-.tutorial-card h1 {
-  font-family: var(--font-display); font-size: 2rem; font-weight: 700;
-  color: var(--text-primary); margin-bottom: 8px; line-height: 1.2;
-}
-.tutorial-card .subtitle {
-  font-size: 1rem; color: var(--text-muted); margin-bottom: 24px;
-  font-style: italic; font-family: var(--font-display);
-}
-.tutorial-card p {
-  font-size: 0.95rem; color: var(--text-secondary); margin-bottom: 16px;
-  line-height: 1.7; text-align: left;
-}
-.tutorial-card strong { color: var(--text-primary); font-weight: 600; }
-.tutorial-steps {
-  display: flex; justify-content: center; gap: 8px; margin: 24px 0 32px;
-}
-.tutorial-step {
-  width: 10px; height: 10px; border-radius: var(--radius-full);
-  background: var(--border); transition: all 0.3s var(--ease-out);
-}
-.tutorial-step.active { background: var(--accent); width: 28px; }
-.tutorial-step.done { background: var(--success); }
-.btn-primary {
-  display: inline-flex; align-items: center; gap: 8px;
-  padding: 14px 32px; border-radius: var(--radius-full);
-  background: var(--accent); color: var(--accent-text);
-  font-weight: 600; font-size: 1rem;
-  transition: all 0.3s var(--ease-out);
-  box-shadow: 0 4px 12px rgba(107,66,38,0.25);
-}
-.btn-primary:hover { background: var(--accent-hover); transform: translateY(-2px); box-shadow: 0 6px 20px rgba(107,66,38,0.3); }
-.btn-secondary {
-  display: inline-flex; align-items: center; gap: 8px;
-  padding: 12px 28px; border-radius: var(--radius-full);
-  background: transparent; color: var(--text-secondary);
-  font-weight: 500; font-size: 0.9rem;
-  border: 1px solid var(--border); transition: all 0.3s var(--ease-out);
-}
-.btn-secondary:hover { border-color: var(--accent); color: var(--accent); }
+  --gal-scene-bg: #142238;
+  --gal-scene-border: #2c3e50;
+  --gal-scene-eyebrow: #00BDFF;
 
-/* ===================== DIFFICULTY SELECT ===================== */
-.difficulty-wrap {
-  min-height: 100vh; display: flex; align-items: center; justify-content: center;
-  padding: 24px;
-  background: linear-gradient(160deg, var(--bg-base) 0%, var(--bg-surface-alt) 100%);
-}
-.difficulty-card {
-  max-width: 640px; width: 100%;
-  background: var(--bg-surface); border-radius: var(--radius-lg);
-  padding: 48px 40px; box-shadow: var(--shadow-lg);
-  text-align: center;
-}
-.difficulty-card h2 {
-  font-family: var(--font-display); font-size: 1.6rem; margin-bottom: 8px;
-}
-.difficulty-card .desc { color: var(--text-muted); margin-bottom: 32px; }
-.difficulty-options { display: flex; flex-direction: column; gap: 16px; }
-.diff-btn {
-  display: flex; align-items: center; gap: 16px;
-  padding: 20px 24px; border-radius: var(--radius-md);
-  background: var(--bg-elevated); border: 2px solid var(--border-subtle);
-  text-align: left; transition: all 0.3s var(--ease-out);
-  width: 100%;
-}
-.diff-btn:hover { border-color: var(--accent); transform: translateX(4px); }
-.diff-btn .diff-icon {
-  width: 48px; height: 48px; border-radius: var(--radius-md);
-  display: flex; align-items: center; justify-content: center;
-  font-size: 22px; flex-shrink: 0;
-}
-.diff-btn .diff-label { font-weight: 700; font-size: 1.05rem; margin-bottom: 2px; }
-.diff-btn .diff-desc { font-size: 0.85rem; color: var(--text-muted); }
-.diff-btn[data-level="junior"] .diff-icon { background: var(--info-light); }
-.diff-btn[data-level="pleno"] .diff-icon { background: var(--warning-light); }
-.diff-btn[data-level="senior"] .diff-icon { background: var(--danger-light); }
-
-/* ===================== NAME INPUT ===================== */
-.name-wrap {
-  min-height: 100vh; display: flex; align-items: center; justify-content: center;
-  padding: 24px;
-  background: linear-gradient(160deg, var(--bg-base) 0%, var(--bg-surface-alt) 100%);
-}
-.name-card {
-  max-width: 480px; width: 100%;
-  background: var(--bg-surface); border-radius: var(--radius-lg);
-  padding: 48px 40px; box-shadow: var(--shadow-lg);
-  text-align: center;
-}
-.name-card h2 { font-family: var(--font-display); font-size: 1.5rem; margin-bottom: 8px; }
-.name-card .desc { color: var(--text-muted); margin-bottom: 24px; }
-.name-input {
-  width: 100%; padding: 14px 18px; border-radius: var(--radius-md);
-  border: 2px solid var(--border); background: var(--bg-elevated);
-  font-size: 1rem; color: var(--text-primary);
-  transition: border-color 0.3s; margin-bottom: 20px;
-}
-.name-input:focus { outline: none; border-color: var(--accent); }
-
-/* ===================== GAME LAYOUT ===================== */
-.game-wrap {
-  min-height: 100vh; padding: 16px;
-  background: var(--bg-base);
-}
-.game-container {
-  max-width: 900px; margin: 0 auto;
-}
-
-/* Header */
-.game-header {
-  display: flex; align-items: center; justify-content: space-between;
-  padding: 12px 0; margin-bottom: 16px;
-  border-bottom: 1px solid var(--border-subtle);
-}
-.game-title {
-  font-family: var(--font-display); font-size: 1.1rem;
-  color: var(--text-secondary);
-}
-.game-meta {
-  display: flex; align-items: center; gap: 16px;
-  font-size: 0.82rem; color: var(--text-muted);
-}
-.turn-badge {
-  padding: 4px 12px; border-radius: var(--radius-full);
-  background: var(--accent-light); color: var(--accent);
-  font-weight: 600; font-size: 0.8rem;
-}
-.phase-badge {
-  padding: 4px 12px; border-radius: var(--radius-full);
-  background: var(--info-light); color: var(--info);
-  font-weight: 600; font-size: 0.8rem;
-}
-
-/* Indicators Row */
-.indicators-row {
-  display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px;
-  margin-bottom: 16px;
-}
-.indicator-card {
-  background: var(--bg-surface); border-radius: var(--radius-md);
-  padding: 14px 12px; text-align: center;
-  border: 1px solid var(--border-subtle); box-shadow: var(--shadow-xs);
-  position: relative; overflow: hidden;
-}
-.indicator-card::after {
-  content: ''; position: absolute; bottom: 0; left: 0; right: 0;
-  height: 3px; background: var(--ind-color, var(--accent));
-  transform-origin: left; transition: transform 0.6s var(--ease-out);
-}
-.indicator-card .ind-label {
-  font-size: 0.7rem; font-weight: 600; text-transform: uppercase;
-  letter-spacing: 0.05em; color: var(--text-muted); margin-bottom: 6px;
-}
-.indicator-card .ind-value {
-  font-family: var(--font-mono); font-size: 1.5rem; font-weight: 700;
-  color: var(--text-primary);
-}
-.indicator-card .ind-bar {
-  margin-top: 8px; height: 4px; border-radius: 2px;
-  background: var(--border-subtle); overflow: hidden;
-}
-.indicator-card .ind-fill {
-  height: 100%; border-radius: 2px; transition: width 0.8s var(--ease-out);
-}
-.indicator-card:nth-child(1) { --ind-color: var(--indicator-1); }
-.indicator-card:nth-child(2) { --ind-color: var(--indicator-2); }
-.indicator-card:nth-child(3) { --ind-color: var(--indicator-3); }
-.indicator-card:nth-child(4) { --ind-color: var(--indicator-4); }
-.indicator-card:nth-child(1) .ind-fill { background: var(--indicator-1); }
-.indicator-card:nth-child(2) .ind-fill { background: var(--indicator-2); }
-.indicator-card:nth-child(3) .ind-fill { background: var(--indicator-3); }
-.indicator-card:nth-child(4) .ind-fill { background: var(--indicator-4); }
-
-/* Main Card */
-.main-card {
-  background: var(--bg-surface); border-radius: var(--radius-lg);
-  box-shadow: var(--shadow-md); border: 1px solid var(--border-subtle);
-  overflow: hidden; margin-bottom: 16px;
-}
-.main-card-header {
-  padding: 20px 24px 16px;
-  border-bottom: 1px solid var(--border-subtle);
-  background: var(--bg-elevated);
-}
-.main-card-header h3 {
-  font-family: var(--font-display); font-size: 1.2rem; margin-bottom: 2px;
-}
-.main-card-header .phase-desc { font-size: 0.85rem; color: var(--text-muted); }
-.main-card-body { padding: 24px; }
-
-/* Narrative Box */
-.narrative-box {
-  background: var(--bg-elevated); border-radius: var(--radius-md);
-  padding: 20px; margin-bottom: 20px;
-  border-left: 3px solid var(--accent);
-  font-size: 0.92rem; line-height: 1.75; color: var(--text-secondary);
-  white-space: pre-wrap;
-}
-.narrative-box strong { color: var(--text-primary); }
-
-/* Response Area */
-.response-area { margin-top: 16px; }
-.response-area label {
-  display: block; font-weight: 600; font-size: 0.85rem;
-  color: var(--text-secondary); margin-bottom: 8px;
-}
-.response-hint {
-  font-size: 0.8rem; color: var(--text-muted); line-height: 1.5;
-  background: var(--bg-elevated); border-left: 3px solid var(--accent);
-  padding: 10px 14px; border-radius: var(--radius-sm);
-  margin-bottom: 10px;
-}
-.response-hint strong { color: var(--text-secondary); font-weight: 600; }
-.response-textarea {
-  width: 100%; min-height: 120px; padding: 16px;
-  border-radius: var(--radius-md); border: 2px solid var(--border);
-  background: var(--bg-elevated); color: var(--text-primary);
-  font-size: 0.92rem; line-height: 1.6; resize: vertical;
-  transition: border-color 0.3s;
-}
-.response-textarea:focus { outline: none; border-color: var(--accent); }
-.response-textarea::placeholder { color: var(--text-muted); }
-.char-counter {
-  text-align: right; font-size: 0.75rem; color: var(--text-muted);
-  margin-top: 6px;
-}
-.char-counter.warning { color: var(--danger); }
-
-/* Toggle Group (investigation type / framework) */
-.toggle-group { margin-bottom: 16px; }
-.toggle-group label {
-  display: block; font-weight: 600; font-size: 0.85rem;
-  color: var(--text-secondary); margin-bottom: 8px;
-}
-.toggle-options { display: flex; flex-wrap: wrap; gap: 8px; }
-.toggle-opt {
-  padding: 8px 16px; border-radius: var(--radius-full);
-  border: 1px solid var(--border); background: var(--bg-elevated);
-  font-size: 0.82rem; font-weight: 500; color: var(--text-secondary);
-  transition: all 0.25s var(--ease-out); user-select: none;
-}
-.toggle-opt:hover { border-color: var(--accent); color: var(--accent); }
-.toggle-opt.selected {
-  background: var(--accent); color: var(--accent-text);
-  border-color: var(--accent);
-}
-
-/* Submit Row */
-.submit-row {
-  display: flex; flex-direction: column; align-items: stretch;
-  margin-top: 20px; gap: 10px;
-}
-.consultants-row {
-  display: flex; gap: 10px; flex-wrap: wrap;
-}
-.submit-btn {
-  padding: 14px 32px; border-radius: var(--radius-full);
-  background: var(--accent); color: var(--accent-text);
-  font-weight: 600; font-size: 0.95rem;
-  transition: all 0.3s var(--ease-out);
-  box-shadow: 0 4px 12px rgba(107,66,38,0.2);
-  text-align: center; width: 100%;
-}
-.submit-btn:hover:not(:disabled) { background: var(--accent-hover); transform: translateY(-1px); }
-.submit-btn:disabled { opacity: 0.5; cursor: not-allowed; }
-.consultant-btn {
-  padding: 10px 20px; border-radius: var(--radius-full);
-  border: 1px solid var(--border); background: var(--bg-elevated);
-  font-size: 0.85rem; font-weight: 500; color: var(--text-secondary);
-  display: flex; align-items: center; gap: 6px;
-  transition: all 0.25s var(--ease-out);
-}
-.consultant-btn:hover { border-color: var(--accent); color: var(--accent); }
-
-/* Loading */
-.loading-overlay {
-  display: none; position: fixed; inset: 0; z-index: 900;
-  background: rgba(30,26,20,0.3); backdrop-filter: blur(4px);
-  align-items: center; justify-content: center;
-}
-.loading-overlay.active { display: flex; }
-.loading-box {
-  background: var(--bg-surface); border-radius: var(--radius-lg);
-  padding: 40px 48px; text-align: center; box-shadow: var(--shadow-lg);
-}
-.loading-spinner {
-  width: 40px; height: 40px; border: 3px solid var(--border);
-  border-top-color: var(--accent); border-radius: 50%;
-  animation: spin 0.8s linear infinite; margin: 0 auto 16px;
-}
-@keyframes spin { to { transform: rotate(360deg); } }
-.loading-text { color: var(--text-secondary); font-size: 0.9rem; }
-
-/* Consultant Panel */
-.consultant-overlay {
-  display: none; position: fixed; inset: 0; z-index: 800;
-  background: rgba(30,26,20,0.4); backdrop-filter: blur(4px);
-}
-.consultant-overlay.active { display: flex; align-items: center; justify-content: center; }
-.consultant-panel {
-  max-width: 520px; width: 90%;
-  background: var(--bg-surface); border-radius: var(--radius-lg);
-  padding: 32px; box-shadow: var(--shadow-lg);
-  max-height: 80vh; overflow-y: auto;
-  animation: slideUp 0.4s var(--ease-spring);
-}
-@keyframes slideUp { from { opacity:0; transform: translateY(20px); } to { opacity:1; transform: translateY(0); } }
-.consultant-panel h3 {
-  font-family: var(--font-display); font-size: 1.2rem; margin-bottom: 4px;
-}
-.consultant-panel .role { font-size: 0.85rem; color: var(--text-muted); margin-bottom: 16px; }
-.consultant-panel .opinion {
-  font-size: 0.9rem; line-height: 1.7; color: var(--text-secondary); white-space: pre-wrap;
-}
-.consultant-panel .close-panel {
-  margin-top: 20px; padding: 10px 24px; border-radius: var(--radius-full);
-  background: var(--accent); color: var(--accent-text); font-weight: 600;
-  transition: all 0.25s;
-}
-.consultant-panel .close-panel:hover { background: var(--accent-hover); }
-
-/* Error */
-.error-box {
-  display: none; background: var(--danger-light); border: 1px solid var(--danger);
-  border-radius: var(--radius-md); padding: 16px; margin-bottom: 16px;
-  color: var(--danger); font-size: 0.88rem;
-}
-.error-box.active { display: block; }
-.error-box button {
-  margin-top: 8px; padding: 6px 16px; border-radius: var(--radius-full);
-  background: var(--danger); color: white; font-size: 0.8rem; font-weight: 600;
-}
-
-/* Game Over */
-.gameover-wrap {
-  min-height: 100vh; display: flex; align-items: center; justify-content: center;
-  padding: 24px; background: linear-gradient(160deg, var(--bg-base) 0%, var(--bg-surface-alt) 100%);
-}
-.gameover-card {
-  max-width: 680px; width: 100%;
-  background: var(--bg-surface); border-radius: var(--radius-lg);
-  padding: 48px 40px; box-shadow: var(--shadow-lg); text-align: center;
-}
-.gameover-card h2 {
-  font-family: var(--font-display); font-size: 2rem; margin-bottom: 8px;
-}
-.gameover-card .verdict {
-  font-size: 1.1rem; color: var(--text-muted); font-style: italic;
-  font-family: var(--font-display); margin-bottom: 24px;
-}
-.final-indicators {
-  display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px;
-  margin-bottom: 24px;
-}
-.final-ind {
-  padding: 16px; border-radius: var(--radius-md);
-  background: var(--bg-elevated); border: 1px solid var(--border-subtle);
-}
-.final-ind .fi-label { font-size: 0.75rem; font-weight: 600; text-transform: uppercase; color: var(--text-muted); }
-.final-ind .fi-value { font-family: var(--font-mono); font-size: 1.8rem; font-weight: 700; }
-.final-narrative {
-  text-align: left; background: var(--bg-elevated); border-radius: var(--radius-md);
-  padding: 20px; margin-bottom: 24px; font-size: 0.9rem; line-height: 1.7;
-  color: var(--text-secondary); white-space: pre-wrap;
-  border-left: 3px solid var(--accent);
-}
-.gameover-actions { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
-
-/* Daily Block */
-.daily-block-wrap {
-  min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 24px;
-  background: linear-gradient(160deg, var(--bg-base) 0%, var(--bg-surface-alt) 100%);
-}
-.daily-block-card {
-  max-width: 480px; width: 100%; background: var(--bg-surface);
-  border-radius: var(--radius-lg); padding: 48px 40px;
-  box-shadow: var(--shadow-lg); text-align: center;
-}
-.daily-block-card h2 { font-family: var(--font-display); font-size: 1.5rem; margin-bottom: 12px; }
-.daily-block-card p { color: var(--text-secondary); margin-bottom: 24px; }
-
-/* ===================== RESPONSIVE ===================== */
-@media (max-width: 640px) {
-  .indicators-row { grid-template-columns: repeat(2, 1fr); }
-  .final-indicators { grid-template-columns: 1fr; }
-  .tutorial-card, .difficulty-card, .name-card, .gameover-card { padding: 32px 24px; }
-  .tutorial-card h1 { font-size: 1.6rem; }
-  .main-card-body { padding: 16px; }
-  .consultants-row { flex-direction: column; }
-  .consultant-btn { width: 100%; justify-content: center; }
-  .game-header { flex-direction: column; gap: 8px; align-items: flex-start; }
+  --gal-pill-bg: #1a2c45;
+  --gal-pill-border: #2c3e50;
+  --gal-pill-text: #C9D5E3;
 }
 </style>
 </head>
 <body>
 
-<!-- THEME TOGGLE -->
-<button class="theme-toggle" onclick="toggleTheme()" title="Alternar tema">🌙</button>
+<!-- Root onde o core v1.3 renderiza todas as telas -->
+<div id="activeia-root"></div>
 
-<!-- ============ SCREEN: TUTORIAL 1 ============ -->
-<div id="tutorial1" class="screen active">
-<div class="tutorial-wrap">
-<div class="tutorial-card">
-  <span class="tutorial-icon">🔬</span>
-  <h1>Folículo</h1>
-  <p class="subtitle">Simulador de Raciocínio Tricológico</p>
-  <p>Você é um <strong>profissional de tricologia em formação</strong>, realizando atendimentos clínicos em uma clínica-escola de estética capilar avançada.</p>
-  <p>Clientes reais chegam com queixas capilares variadas. Seu papel é <strong>investigar a queixa, fundamentar biologicamente suas hipóteses</strong> e <strong>decidir a melhor conduta</strong> — incluindo quando encaminhar ao dermatologista.</p>
-  <div class="tutorial-steps">
-    <div class="tutorial-step active"></div>
-    <div class="tutorial-step"></div>
-    <div class="tutorial-step"></div>
-    <div class="tutorial-step"></div>
-  </div>
-  <button class="btn-primary" onclick="showScreen('tutorial2')">Continuar →</button>
-</div>
-</div>
-</div>
+<!-- Active IA Core v1.4.1 -->
+<script src="https://galiciaeducacao.github.io/activeia-core/v1/core.js?v=1.4.1"></script>
 
-<!-- ============ SCREEN: TUTORIAL 2 ============ -->
-<div id="tutorial2" class="screen">
-<div class="tutorial-wrap">
-<div class="tutorial-card">
-  <span class="tutorial-icon">📋</span>
-  <h1>Como funciona</h1>
-  <p class="subtitle">Três fases por caso clínico</p>
-  <p><strong>🔍 Observação</strong> — Investigue: escolha que tipo de exame ou investigação realizar (anamnese, avaliação visual, análise da haste, palpação do couro cabeludo) e descreva o que procura e por quê.</p>
-  <p><strong>🧬 Fundamentação</strong> — Articule a biologia: relacione os achados com a anatomia do folículo, o ciclo capilar e a fisiologia estudada. Formule hipóteses.</p>
-  <p><strong>⚕️ Conduta</strong> — Decida: proponha um plano (cuidado estético, encaminhamento ao dermatologista, ou ambos) e justifique.</p>
-  <div class="tutorial-steps">
-    <div class="tutorial-step done"></div>
-    <div class="tutorial-step active"></div>
-    <div class="tutorial-step"></div>
-    <div class="tutorial-step"></div>
-  </div>
-  <button class="btn-primary" onclick="showScreen('tutorial3')">Continuar →</button>
-  <br><br>
-  <button class="btn-secondary" onclick="showScreen('tutorial1')">← Voltar</button>
-</div>
-</div>
-</div>
-
-<!-- ============ SCREEN: TUTORIAL 3 — ARTICULAÇÃO ============ -->
-<div id="tutorial3" class="screen">
-<div class="tutorial-wrap">
-<div class="tutorial-card">
-  <span class="tutorial-icon">✍️</span>
-  <h1>Como responder</h1>
-  <p class="subtitle">Especificidade é o que separa uma resposta boa de uma medíocre</p>
-  <p>Em cada turno, você escreve em texto livre o que vai fazer. <strong>A riqueza da narrativa e a sua pontuação dependem diretamente do quanto você articula</strong>. Nomear apenas o instrumento ("farei uma anamnese", "vou examinar o couro") rende pouco — a paciente responde com o óbvio e você sai do turno com pouca informação.</p>
-  <p>O que uma resposta <strong>articulada</strong> contém:</p>
-  <p style="margin-left:12px;">• <strong>O que</strong> você vai investigar — os eixos concretos (cronologia, gatilhos, histórico familiar, padrão de distribuição...)</p>
-  <p style="margin-left:12px;">• <strong>Por que</strong> — qual hipótese ou conceito motiva aquela investigação</p>
-  <p style="margin-left:12px;">• <strong>Como</strong> — em que ordem, com que instrumento, buscando que sinal específico</p>
-  <p style="margin-top:12px;"><em>Exemplo fraco:</em> "Farei uma anamnese para entender gatilhos."</p>
-  <p><em>Exemplo forte:</em> "Anamnese dirigida: cronologia da queda e padrão de distribuição, episódios de estresse ou doença nos últimos 3-6 meses, uso atual ou recente de anticoncepcional, histórico familiar de alopecia, e alterações alimentares. Quero rastrear eflúvio telógeno vs padrão androgenético."</p>
-  <p style="margin-top:12px;">A segunda resposta rende muito mais — em pontos e em informação recebida.</p>
-  <div class="tutorial-steps">
-    <div class="tutorial-step done"></div>
-    <div class="tutorial-step done"></div>
-    <div class="tutorial-step active"></div>
-    <div class="tutorial-step"></div>
-  </div>
-  <button class="btn-primary" onclick="showScreen('tutorial4')">Continuar →</button>
-  <br><br>
-  <button class="btn-secondary" onclick="showScreen('tutorial2')">← Voltar</button>
-</div>
-</div>
-</div>
-
-<!-- ============ SCREEN: TUTORIAL 4 — AVALIAÇÃO ============ -->
-<div id="tutorial4" class="screen">
-<div class="tutorial-wrap">
-<div class="tutorial-card">
-  <span class="tutorial-icon">📊</span>
-  <h1>Avaliação</h1>
-  <p class="subtitle">Quatro indicadores guiam seu desempenho</p>
-  <p><strong>🔵 Acurácia Observacional</strong> — Você investiga com método? Direciona a investigação com especificidade?</p>
-  <p><strong>🟤 Fundamentação Biológica</strong> — Suas hipóteses se ancoram na anatomia do folículo, no ciclo capilar e na fisiologia estudada?</p>
-  <p><strong>🟢 Segurança do Cliente</strong> — Você reconhece quando encaminhar? Evita condutas que excedam seu escopo profissional?</p>
-  <p><strong>🟠 Conduta Profissional</strong> — Sua comunicação é clara, ética e adequada ao contexto clínico?</p>
-  <p style="margin-top:12px;">Os indicadores começam zerados (Segurança começa em 50) e se acumulam turno a turno conforme você acerta. A cada turno, <strong>cada resposta ao final traz um feedback explicando o que você fez bem e o que faltou articular melhor</strong>.</p>
-  <p>Se seu desempenho ficar sistematicamente abaixo do mínimo esperado, a simulação encerra.</p>
-  <div class="tutorial-steps">
-    <div class="tutorial-step done"></div>
-    <div class="tutorial-step done"></div>
-    <div class="tutorial-step done"></div>
-    <div class="tutorial-step active"></div>
-  </div>
-  <button class="btn-primary" onclick="showScreen('difficulty')">Iniciar simulação →</button>
-  <br><br>
-  <button class="btn-secondary" onclick="showScreen('tutorial3')">← Voltar</button>
-</div>
-</div>
-</div>
-
-<!-- ============ SCREEN: TUTORIAL 3 (OLD — replaced above) ============ -->
-<div id="tutorial3_old" class="screen" style="display:none;">
-<div class="tutorial-wrap">
-<div class="tutorial-card">
-  <span class="tutorial-icon">📊</span>
-  <h1>Avaliação</h1>
-  <p class="subtitle">Quatro indicadores guiam seu desempenho</p>
-  <p><strong>🔵 Acurácia Observacional</strong> — Você investiga com método? Seleciona os exames certos? Observa detalhes relevantes?</p>
-  <p><strong>🟤 Fundamentação Biológica</strong> — Suas hipóteses se ancoram na anatomia do folículo, no ciclo capilar e na fisiologia estudada?</p>
-  <p><strong>🟢 Segurança do Cliente</strong> — Você reconhece quando encaminhar? Evita condutas que excedam seu escopo profissional?</p>
-  <p><strong>🟠 Conduta Profissional</strong> — Sua comunicação é clara, ética e adequada ao contexto clínico?</p>
-  <p style="margin-top:12px;">Se qualquer indicador chegar a <strong>zero</strong>, a simulação encerra automaticamente.</p>
-  <div class="tutorial-steps">
-    <div class="tutorial-step done"></div>
-    <div class="tutorial-step done"></div>
-    <div class="tutorial-step active"></div>
-  </div>
-  <button class="btn-primary" onclick="showScreen('difficulty')">Iniciar simulação →</button>
-  <br><br>
-  <button class="btn-secondary" onclick="showScreen('tutorial2')">← Voltar</button>
-</div>
-</div>
-</div>
-
-<!-- ============ SCREEN: DIFFICULTY ============ -->
-<div id="difficulty" class="screen">
-<div class="difficulty-wrap">
-<div class="difficulty-card">
-  <h2>Escolha seu nível</h2>
-  <p class="desc">Cada nível aumenta a complexidade dos casos e o número de turnos.</p>
-  <div class="difficulty-options">
-    <button class="diff-btn" data-level="junior" onclick="selectDifficulty('junior')">
-      <div class="diff-icon">🌱</div>
-      <div>
-        <div class="diff-label">Júnior — 4 turnos</div>
-        <div class="diff-desc">Casos mais diretos. Queixas isoladas, sinais claros. Ideal para consolidar fundamentos.</div>
-      </div>
-    </button>
-    <button class="diff-btn" data-level="pleno" onclick="selectDifficulty('pleno')">
-      <div class="diff-icon">🌿</div>
-      <div>
-        <div class="diff-label">Pleno — 6 turnos</div>
-        <div class="diff-desc">Casos com nuances. Sobreposição de sintomas, necessidade de investigação mais detalhada.</div>
-      </div>
-    </button>
-    <button class="diff-btn" data-level="senior" onclick="selectDifficulty('senior')">
-      <div class="diff-icon">🌳</div>
-      <div>
-        <div class="diff-label">Sênior — 9 turnos</div>
-        <div class="diff-desc">Casos complexos. Múltiplas variáveis, decisões éticas delicadas, exigência de fundamentação profunda.</div>
-      </div>
-    </button>
-  </div>
-</div>
-</div>
-</div>
-
-<!-- ============ SCREEN: NAME ============ -->
-<div id="namescreen" class="screen">
-<div class="name-wrap">
-<div class="name-card">
-  <h2>Identifique-se</h2>
-  <p class="desc">Seu nome aparecerá no relatório final.</p>
-  <input type="text" id="playerName" class="name-input" placeholder="Seu nome completo" maxlength="80" autocomplete="name">
-  <button class="btn-primary" onclick="startGame()" id="startBtn">Começar atendimento →</button>
-</div>
-</div>
-</div>
-
-<!-- ============ SCREEN: GAME ============ -->
-<div id="gamescreen" class="screen">
-<div class="game-wrap">
-<div class="game-container">
-
-  <!-- Header -->
-  <div class="game-header">
-    <div class="game-title">Folículo — <span id="levelLabel"></span></div>
-    <div class="game-meta">
-      <span class="phase-badge" id="phaseBadge">Observação</span>
-      <span class="turn-badge" id="turnBadge">Turno 1/4</span>
-    </div>
-  </div>
-
-  <!-- Indicators -->
-  <div class="indicators-row" id="indicatorsRow">
-    <div class="indicator-card">
-      <div class="ind-label">Acurácia Observacional</div>
-      <div class="ind-value" id="ind1val">0</div>
-      <div class="ind-bar"><div class="ind-fill" id="ind1bar" style="width:0%"></div></div>
-    </div>
-    <div class="indicator-card">
-      <div class="ind-label">Fundamentação Biológica</div>
-      <div class="ind-value" id="ind2val">0</div>
-      <div class="ind-bar"><div class="ind-fill" id="ind2bar" style="width:0%"></div></div>
-    </div>
-    <div class="indicator-card">
-      <div class="ind-label">Segurança do Cliente</div>
-      <div class="ind-value" id="ind3val">50</div>
-      <div class="ind-bar"><div class="ind-fill" id="ind3bar" style="width:50%"></div></div>
-    </div>
-    <div class="indicator-card">
-      <div class="ind-label">Conduta Profissional</div>
-      <div class="ind-value" id="ind4val">0</div>
-      <div class="ind-bar"><div class="ind-fill" id="ind4bar" style="width:0%"></div></div>
-    </div>
-  </div>
-
-  <!-- Error -->
-  <div class="error-box" id="errorBox">
-    <strong>Erro de comunicação</strong>
-    <p id="errorMsg"></p>
-    <button onclick="retryLastAction()">Tentar novamente</button>
-  </div>
-
-  <!-- Main Card -->
-  <div class="main-card">
-    <div class="main-card-header">
-      <h3 id="phaseTitle">🔍 Fase de Observação</h3>
-      <p class="phase-desc" id="phaseDesc">Investigue o caso. Escolha como examinar e descreva o que procura.</p>
-    </div>
-    <div class="main-card-body">
-      <div class="narrative-box" id="narrativeBox">Carregando caso clínico...</div>
-
-      <!-- Investigation toggle (observation phase) — SINGLE SELECT, tracks used -->
-      <div class="toggle-group" id="investigationToggle" style="display:none;">
-        <label>Escolha UMA investigação para este turno</label>
-        <div class="toggle-options" id="investigationOptions">
-          <button class="toggle-opt" data-val="anamnese" onclick="selectInvestigation(this)">📝 Anamnese</button>
-          <button class="toggle-opt" data-val="visual" onclick="selectInvestigation(this)">👁️ Exame visual</button>
-          <button class="toggle-opt" data-val="haste" onclick="selectInvestigation(this)">🔬 Análise da haste</button>
-          <button class="toggle-opt" data-val="palpacao" onclick="selectInvestigation(this)">🤚 Palpação do couro</button>
-          <button class="toggle-opt" data-val="tracao" onclick="selectInvestigation(this)">💇 Teste de tração</button>
-        </div>
-      </div>
-
-      <!-- Framework toggle (reasoning phase) -->
-      <div class="toggle-group" id="frameworkToggle" style="display:none;">
-        <label>Referência teórica</label>
-        <div class="toggle-options">
-          <button class="toggle-opt" data-val="anatomia" onclick="toggleSelect(this,'framework')">🦴 Anatomia folicular</button>
-          <button class="toggle-opt" data-val="ciclo" onclick="toggleSelect(this,'framework')">🔄 Ciclo capilar</button>
-          <button class="toggle-opt" data-val="molecular" onclick="toggleSelect(this,'framework')">🧬 Sinalização molecular</button>
-          <button class="toggle-opt" data-val="clinica" onclick="toggleSelect(this,'framework')">🏥 Correlação clínica</button>
-        </div>
-      </div>
-
-      <!-- Response -->
-      <div class="response-area">
-        <label id="responseLabel">Sua análise</label>
-        <div class="response-hint" id="responseHint">💡 Quanto mais específico você for sobre <strong>o que</strong> investigar, <strong>por que</strong> e <strong>como</strong>, mais rica será a resposta e maior sua pontuação. Nomear apenas a categoria ("farei uma anamnese") rende pouco — articule os eixos concretos.</div>
-        <textarea class="response-textarea" id="responseText" placeholder="Seja específico: liste os eixos que quer investigar, o que procura em cada um, e por quê..." oninput="updateCharCount()"></textarea>
-        <div class="char-counter" id="charCounter">0 palavras</div>
-      </div>
-
-      <!-- Submit -->
-      <div class="submit-row">
-        <div class="consultants-row">
-          <button class="consultant-btn" onclick="openConsultant('renata')">
-            🩺 Dra. Renata <span style="color:var(--text-muted);font-size:0.75rem;">(Dermatologista)</span>
-          </button>
-          <button class="consultant-btn" onclick="openConsultant('marcos')">
-            🔬 Prof. Marcos <span style="color:var(--text-muted);font-size:0.75rem;">(Biólogo)</span>
-          </button>
-        </div>
-        <button class="submit-btn" id="submitBtn" onclick="submitResponse()" disabled>Enviar resposta →</button>
-      </div>
-    </div>
-  </div>
-
-</div>
-</div>
-</div>
-
-<!-- ============ SCREEN: GAME OVER ============ -->
-<div id="gameover" class="screen">
-<div class="gameover-wrap">
-<div class="gameover-card">
-  <span class="tutorial-icon" id="goIcon">📊</span>
-  <h2 id="goTitle">Simulação Concluída</h2>
-  <p class="verdict" id="goVerdict"></p>
-  <div class="final-indicators" id="finalIndicators"></div>
-  <div class="final-narrative" id="goNarrative"></div>
-  <div class="gameover-actions">
-    <button class="btn-primary" onclick="resetGame()">Nova simulação</button>
-    <button class="btn-secondary" onclick="exportReport()">📄 Exportar relatório</button>
-  </div>
-</div>
-</div>
-</div>
-
-<!-- ============ SCREEN: DAILY BLOCK ============ -->
-<div id="dailyblock" class="screen">
-<div class="daily-block-wrap">
-<div class="daily-block-card">
-  <span class="tutorial-icon">⏰</span>
-  <h2>Sessão do dia concluída</h2>
-  <p>Você já completou uma simulação hoje. Volte amanhã para um novo caso clínico — cada dia traz um paciente diferente.</p>
-  <p style="margin-top:12px;font-size:0.85rem;color:var(--text-muted);" id="blockTimer"></p>
-</div>
-</div>
-</div>
-
-<!-- ============ LOADING OVERLAY ============ -->
-<div class="loading-overlay" id="loadingOverlay">
-<div class="loading-box">
-  <div class="loading-spinner"></div>
-  <div class="loading-text" id="loadingText">Analisando sua resposta...</div>
-</div>
-</div>
-
-<!-- ============ CONSULTANT OVERLAY ============ -->
-<div class="consultant-overlay" id="consultantOverlay" onclick="closeConsultant(event)">
-<div class="consultant-panel" id="consultantPanel">
-  <h3 id="consultantName"></h3>
-  <p class="role" id="consultantRole"></p>
-  <div class="opinion" id="consultantOpinion">Carregando parecer...</div>
-  <button class="close-panel" onclick="closeConsultantDirect()">Entendi</button>
-</div>
-</div>
-
-<!-- ============================================================ -->
-<!-- JAVASCRIPT -->
-<!-- ============================================================ -->
+<!-- A Consulta — configuração e flow -->
 <script>
-// ===================== CONSTANTS =====================
-const API_URL = 'https://shy-night-916aactive-ai-proxy.galiciaeducacao.workers.dev';
-const MODEL = 'claude-sonnet-4-6';
-const STORAGE_KEY = 'foliculo_sim_v1';
+// ============================================================================
+// A CONSULTA — SAUNUT M01 · SIMULATOR CONFIG
+// Simulador de consulta nutricional comportamental
+// Mecânica: consultoria/escuta diagnóstica (mecânica 3)
+// Escola de Saúde · Curso: Nutrição Comportamental e Emagrecimento · Módulo 01
+// ============================================================================
 
-const LEVEL_CONFIG = {
-  junior: { label: 'Júnior', turns: 4, phases: [2,1,1] },
-  pleno:  { label: 'Pleno',  turns: 6, phases: [2,2,2] },
-  senior: { label: 'Sênior', turns: 9, phases: [3,3,3] }
+const SIMULATOR_CONFIG = {
+  id: 'saunut-m01-consulta-comportamental',
+  title: 'A Consulta',
+  name: 'A Consulta: Nutrição Comportamental — Galícia Educação',
+  subtitle: 'Simulador de Consulta Nutricional Comportamental',
+  version: 'v1.4.0-init',
+  school: 'Saúde',
+  schoolColor: '#0074C7',
+  module: 'SAUNUT M01 — Fundamentos da Nutrição Comportamental',
+  role_context: 'Nutricionista comportamental em consulta ambulatorial de primeira vez',
+  mechanic: 'consultoria',
+
+  // Customização do guard de conduta (core v1.4.0+) — voz específica do consultório
+  conductFailNarrative: 'A paciente para de falar no meio da frase. Você percebe o olhar dela mudar — não é decepção, é constatação. Ela ajeita a bolsa devagar, olha para a porta.\n\n— Doutor(a), eu vim aqui procurando cuidado. Não é isso que eu preciso hoje. Eu vou embora e vou registrar no Conselho.\n\nEla se levanta e sai. A recepcionista bate na porta segundos depois — a paciente pediu prontuário e informou que fará queixa formal.',
+  conductFailFeedback: 'CONDUTA INADMISSÍVEL. Você dirigiu à paciente linguagem agressiva, ofensiva ou moralizante inaceitável na relação clínica. Isso viola o Código de Ética e Conduta do Nutricionista (Resolução CFN vigente) — dever de respeito, sigilo, não discriminação e vínculo terapêutico — e configura infração ética passível de sanção do Conselho Federal de Nutricionistas. Na abordagem comportamental, moralizar a comida ou o corpo do paciente é o oposto do cuidado: aumenta estigma, deteriora vínculo e afasta quem procura ajuda. A simulação foi anulada. Recomendação: revisite o Tema 05 (postura clínica, aliança terapêutica, escopo do nutricionista comportamental) antes de retornar.',
+
+  // ==================================================================
+  // INDICADORES (3)
+  // Regra do rótulo curto (Lição 55): name = 1 palavra p/ painel mobile.
+  // Nome completo aparece no tutorial e no feedback.
+  // ==================================================================
+  indicators: [
+    {
+      id: 'escuta',
+      name: 'Escuta',
+      description: 'Qualidade da escuta ativa: perguntas abertas, reflexões, OARS, ausência de reflexo de correção.',
+      initial: 0,
+      max: 100,
+      color: '#0074C7'
+    },
+    {
+      id: 'diagnostico',
+      name: 'Diagnóstico',
+      description: 'Diagnóstico comportamental: você identificou o perfil predominante (restrição, emocional, externo, TA) e escolheu o instrumento certo?',
+      initial: 0,
+      max: 100,
+      color: '#6E8E5A'
+    },
+    {
+      id: 'escopo',
+      name: 'Escopo',
+      description: 'Aderência ao escopo do nutricionista comportamental e à ética profissional. Começa em 100 e cai com moralização, prescrição rígida ou não-encaminhamento diante de sinal de TA. Indicador de risco: se cair a ≤10, a sessão encerra em qualquer nível.',
+      initial: 100,
+      max: 100,
+      color: '#C97C3D'
+    }
+  ],
+
+  // ==================================================================
+  // CONCEITOS DO MÓDULO (20)
+  // module_ref, não reference. Cobrem T01–T05.
+  // ==================================================================
+  concepts: [
+    { id: 'campo-comportamental', name: 'Delimitação do campo da nutrição comportamental', module_ref: 'T01' },
+    { id: 'biopsicossocial', name: 'Modelo biopsicossocial aplicado ao comer', module_ref: 'T01' },
+    { id: 'ciclo-dieta-recuperacao', name: 'Ciclo dieta-restrição-descontrole-recuperação', module_ref: 'T01' },
+    { id: 'estigma-de-peso', name: 'Estigma de peso e paradigma do peso vs. saúde', module_ref: 'T01' },
+    { id: 'nao-prescricao', name: 'Postura não prescritiva e autonomia do paciente', module_ref: 'T01/T05' },
+    { id: 'fome-fisiologica-vs-emocional', name: 'Diferenciação fome fisiológica × fome emocional', module_ref: 'T02' },
+    { id: 'determinantes-multi', name: 'Determinantes multideterminados (fisiológico + emocional + ambiental)', module_ref: 'T02' },
+    { id: 'ambiente-obesogenico', name: 'Ambiente obesogênico e reatividade a pistas', module_ref: 'T02' },
+    { id: 'comer-intuitivo', name: 'Princípios do comer intuitivo (Tribole & Resch)', module_ref: 'T03' },
+    { id: 'mindful-eating', name: 'Mindful eating e MB-EAT', module_ref: 'T03' },
+    { id: 'evidencia-honesta', name: 'Leitura honesta da evidência (peso × desfechos psicológicos)', module_ref: 'T03' },
+    { id: 'debq', name: 'DEBQ — restrição, emocional, externo', module_ref: 'T04' },
+    { id: 'tfeq', name: 'TFEQ / TFEQ-R18/R21', module_ref: 'T04' },
+    { id: 'ies-2', name: 'IES-2 — 4 dimensões do comer intuitivo', module_ref: 'T04' },
+    { id: 'rastreio-vs-diagnostico', name: 'Rastreio (EAT-26, BES) ≠ diagnóstico de TA', module_ref: 'T04' },
+    { id: 'psicometria-basica', name: 'Psicometria básica — validade, confiabilidade, pontos de corte', module_ref: 'T04' },
+    { id: 'espirito-em', name: 'Espírito da entrevista motivacional (parceria, aceitação, compaixão, evocação)', module_ref: 'T05' },
+    { id: 'oars', name: 'Habilidades OARS (perguntas abertas, afirmações, reflexões, sínteses)', module_ref: 'T05' },
+    { id: 'reflexo-correcao', name: 'Reconhecer e conter o reflexo de correção (righting reflex)', module_ref: 'T05' },
+    { id: 'estagios-mudanca', name: 'Estágios de mudança (Prochaska & DiClemente) e prontidão', module_ref: 'T05' }
+  ],
+
+  // ==================================================================
+  // ARQUÉTIPOS (7)
+  // Estruturados — usados por ActiveIA.archetype.select (memória por sessão)
+  // e pelo QA. A narrativa rica de cada um está em ARCHETYPES_TEXT abaixo.
+  // ==================================================================
+  archetypes: [
+    {
+      id: 'maria-dieteira-cronica',
+      label: 'Maria — dieteira crônica com ciclo dieta-desinibição',
+      seed_description: 'Maria Helena, 42, professora, IMC 32. Chega à consulta pedindo diretamente "uma dieta que funcione". Recita calorias, cita nomes de dietas famosas, se autoproíbe carboidrato durante a semana e "desanda" nos fins de semana com culpa intensa.',
+      central_dilemma: 'Reframe da queixa pela dieta sem confronto e sem entregar mais uma dieta',
+      competency_tested: 'Segurar o reflexo de correção; mapear ciclo restrição-desinibição; escolher DEBQ/TFEQ-R18; introduzir noção de comer intuitivo sem prometer emagrecimento',
+      expected_path: 'Reflexão complexa sobre o esgotamento do ciclo; OARS para mapear padrão emocional/temporal; DEBQ como próximo passo; retorno com registro contextual',
+      red_flags: ['entregar dieta porque a paciente pediu', 'prometer perda de X kg em Y tempo', 'falar "você precisa cortar o pão"', 'só recordatório alimentar sem escuta comportamental']
+    },
+    {
+      id: 'carlos-comedor-emocional',
+      label: 'Carlos — comer emocional pós-jornada estressante',
+      seed_description: 'Carlos Eduardo, 35, gerente comercial. IMC 28. Colesterol subiu — médico pediu que emagrecesse. Chega às 22h em casa e come sem fome, "só de abrir a geladeira". Diz que "não tem força de vontade".',
+      central_dilemma: 'Diferenciar fome fisiológica de fome emocional sem invadir escopo psicológico',
+      competency_tested: 'Perguntas OARS que evocam a função emocional do comer; escolher DEBQ (perfil emocional puro); sinalizar parceria com psicólogo(a); não prescrever "5 refeições estruturadas"',
+      expected_path: 'Modelo de Macht sem jargão; reflexão sobre "o que esse momento te dá?"; DEBQ + registro emocional contextual; sinalizar equipe multiprofissional',
+      red_flags: ['falar "você tem que ter mais disciplina"', 'diagnosticar depressão ou sugerir antidepressivo', 'prescrever cardápio estruturado ignorando emocional']
+    },
+    {
+      id: 'beatriz-comer-externo-noturno',
+      label: 'Beatriz — comer externo em home office (ambiente obesogênico)',
+      seed_description: 'Beatriz, 29, analista de marketing digital, home office, mora sozinha. IMC 26. Belisca o dia todo em frente ao computador, come vendo série à noite. Não tem culpa forte nem restrição — só está curiosa se "é caso pra nutricionista mesmo".',
+      central_dilemma: 'Reconhecer determinante ambiental como estruturante — não moral',
+      competency_tested: 'Mapear ambiente com OARS; nomear reatividade a pistas e framework socioecológico; escolher DEBQ (perfil externo); introduzir mindful eating como prática de atenção',
+      expected_path: 'Perguntas abertas sobre o ambiente concreto; intervenções ambientais concretas (mudar local do biscoito, comer sem tela); DEBQ + registro de comer com/sem atenção',
+      red_flags: ['ignorar ambiente e ir direto pro cardápio', 'falar "você tem que ter força de vontade"', 'só prescrever horários rígidos']
+    },
+    {
+      id: 'rita-sinal-transtorno-alimentar',
+      label: 'Rita — sinais de transtorno alimentar (RASTREIO + ENCAMINHAMENTO)',
+      seed_description: 'Rita, 22, estudante de Educação Física, IMC 20. Diz que "quer emagrecer só uns 3 kg" para o estágio de personal. Se bem escutada, revela restrição severa na semana, episódios compulsivos no fim de semana, exercício exagerado como compensação, checagem de peso 3x/dia. Escondeu tudo da família.',
+      central_dilemma: 'Reconhecer sinais de TA cedo, aplicar rastreio adequado e encaminhar à equipe multiprofissional sem confrontar',
+      competency_tested: 'Escuta sensível sem perguntas frontais sobre TA; EAT-26 e BES (não IES-2 — comer intuitivo é prematuro em TA ativo); encaminhamento OBRIGATÓRIO a psicólogo com formação em TA + psiquiatra + médico; não diagnosticar',
+      expected_path: 'OARS refinado; identificação de sinais de alerta (restrição + compensatório + checagem); sinalização de rastreio; comunicação empática do encaminhamento; retorno agendado paralelo à consulta com equipe',
+      red_flags: ['oferecer dieta pra emagrecer sem rastrear', 'falar "você tem que comer mais" (confronto)', 'diagnosticar bulimia (invade escopo médico)', 'aplicar IES-2 em TA ativo (erro técnico T03)', 'não encaminhar']
+    },
+    {
+      id: 'jorge-pos-bariatrica-reganho',
+      label: 'Jorge — pós-bariátrica com reganho e evento de vida recente',
+      seed_description: 'Jorge, 48, empresário, 2 anos pós-bypass gástrico. Perdeu 40 kg, recuperou 8 kg nos últimos 6 meses. IMC 31. Diz sentir vergonha de "ter feito cirurgia e estar aqui de novo". Se pressionado por escuta, revela separação recente da esposa e comer emocional escalado.',
+      central_dilemma: 'Distinguir acompanhamento clínico pós-bariátrico pertinente (proteína, suplemento, restrição gástrica) de dieta rígida moralizante',
+      competency_tested: 'Acolher a vergonha antes de qualquer conduta (aliança T05); mapear emocional pós-separação; DEBQ; sinalizar equipe (cirurgião + endócrino + psicólogo)',
+      expected_path: 'Reflexão complexa sobre vergonha; escuta biopsicossocial; DEBQ com foco emocional; retorno em 2 semanas paralelo à equipe',
+      red_flags: ['voltar ao plano rigoroso da cirurgia sem tocar no emocional', 'reforçar culpa ("realmente, você recuperou")', 'ignorar recém-separação']
+    },
+    {
+      id: 'luiza-obesidade-e-comorbidade',
+      label: 'Luiza — obesidade grau 3 com HAS/DM2 e estigma acumulado',
+      seed_description: 'Luiza, 51, secretária administrativa, IMC 41, HAS e DM2 recém-diagnosticados. Chega dizendo que "não queria estar aqui" — já foi humilhada em 20 consultórios, sabe que ouvirá "frango e salada". Está exausta de dietas e ambivalente com esperança de novo.',
+      central_dilemma: 'Integrar cuidado de HAS/DM2 com abordagem centrada na saúde (não no peso) sem cair em prescrição moralizante',
+      competency_tested: 'Explicitar estigma zero na fala inicial; reconhecer história de dietas fracassadas (Mann et al.); DEBQ ou TFEQ; introduzir comer intuitivo com honestidade sobre evidência limitada para peso; aliança forte',
+      expected_path: 'Escuta sem julgamento; nomear o estigma; DEBQ + acompanhamento HAS/DM2 sem contagem calórica fechada; foco em bem-estar e não em kg; retorno sem meta de peso',
+      red_flags: ['falar "mas você TEM que emagrecer, você tem DM"', 'prometer "vamos perder 20 kg em 6 meses"', 'aplicar só comer intuitivo sem tocar em HAS/DM2']
+    },
+    {
+      id: 'paulo-ortorexia-nascente',
+      label: 'Paulo — ortorexia começando em contexto esportivo',
+      seed_description: 'Paulo, 38, engenheiro, corredor amador, IMC 24. Pede ajuste do plano low-carb estrito para "baixar de 12% pra 8% de gordura". Se bem escutado, revela que recusou convite de aniversário porque o bolo "não estava no plano" e discute com esposa sobre comida.',
+      central_dilemma: 'Distinguir cuidado nutricional esportivo pertinente de rigidez moralizante disfuncional',
+      competency_tested: 'Não validar a rigidez; OARS evocativo do custo social e afetivo; considerar EAT-26 e sinalizar equipe (psi com formação em ortorexia + médico esporte); não diagnosticar',
+      expected_path: 'Reflexão complexa sobre "o que essa rigidez está te custando?"; rastreio; retorno + avaliação em equipe',
+      red_flags: ['validar "ótimo, vamos ajustar os macros pra 8%"', 'falar "isso é ortorexia, você tem transtorno" (diagnosticar)', 'ignorar recusa do aniversário como sinal']
+    }
+  ],
+
+  // ==================================================================
+  // NÍVEIS
+  // ==================================================================
+  levels: {
+    junior: {
+      label: 'Júnior',
+      turns: 4,
+      description: 'Paciente com perfil comportamental relativamente claro. Uma dor central. Treino dos fundamentos.',
+      consultantLimit: 1
+    },
+    pleno: {
+      label: 'Pleno',
+      turns: 6,
+      description: 'Paciente com perfil misto (dois padrões sobrepostos) e ambivalência viva. Exige leitura de estágio de mudança.',
+      consultantLimit: 0
+    },
+    senior: {
+      label: 'Sênior',
+      turns: 8,
+      description: 'Paciente com sinais de risco (TA, condição clínica combinada, comorbidades). Onde o(a) nutricionista se forma.',
+      consultantLimit: 0
+    }
+  },
+
+  // ==================================================================
+  // CONSULTOR (apenas Júnior)
+  // ==================================================================
+  consultants: [
+    {
+      id: 'coordenadora',
+      name: 'Coordenadora clínica',
+      role: 'Nutricionista comportamental sênior — supervisão em tempo real',
+      description: 'Pode ser consultada UMA vez na sessão (apenas Júnior). Dá orientação tática rápida sobre postura e próximo passo.',
+      icon: '🎧'
+    }
+  ],
+
+  // ==================================================================
+  // FASES (informativas, não bloqueiam estrutura)
+  // ==================================================================
+  phases: [
+    { id: 'engajar', name: 'Engajar', icon: '🤝' },
+    { id: 'focar', name: 'Focar', icon: '🔍' },
+    { id: 'evocar', name: 'Evocar', icon: '💬' },
+    { id: 'planejar', name: 'Planejar', icon: '📋' }
+  ],
+
+  // ==================================================================
+  // MICROCOPY — textos das telas estruturais
+  // ==================================================================
+  microcopy: {
+    boot: {
+      eyebrow: 'GALÍCIA EDUCAÇÃO · ACTIVE IA',
+      title: 'A Consulta',
+      subtitle: 'Simulador de Consulta Nutricional Comportamental',
+      tagline: 'Você não vai treinar prescrição. Vai treinar escuta.',
+      loadingLabel: 'Preparando o consultório'
+    },
+
+    tutorial: {
+      slides: [
+        {
+          eyebrow: 'O CONTEXTO',
+          title: 'Você é nutricionista comportamental.',
+          body: '<p>Uma pessoa acaba de chegar ao seu consultório para a primeira consulta. Ela traz alguma dor com comida, corpo, peso ou hábito alimentar. Sua tarefa <strong>não é prescrever uma dieta</strong>. Sua tarefa é <strong>escutar, mapear e evocar</strong> — do jeito que os Temas 01 a 05 do M01 definiram.</p><p>Cada sessão sorteia um paciente diferente: da comedora restrita crônica ao rapaz com comer emocional, da mulher com sinais de risco para transtorno alimentar ao homem pós-cirurgia bariátrica com reganho. Você se adapta.</p>',
+          examples: null
+        },
+        {
+          eyebrow: 'A MECÂNICA',
+          title: 'A IA é o paciente. Você é o(a) nutricionista.',
+          body: '<p>A cada turno, o paciente responde como gente real — com hesitações, ambivalência, pressa, e uma dor que nem sempre nomeia. Você lê o que ele disse, decide o próximo movimento, e escreve sua fala.</p><p>O simulador acompanha <strong>3 indicadores</strong>:</p><ul><li><strong>Escuta</strong> — qualidade da escuta ativa (perguntas abertas, reflexões, ausência de reflexo de correção).</li><li><strong>Diagnóstico</strong> comportamental — você identificou o padrão predominante (restrição, emocional, externo, risco de TA) e escolheu o instrumento certo (DEBQ, TFEQ, EAT-26, BES, IES-2)?</li><li><strong>Escopo</strong> — aderência ao escopo do nutricionista comportamental e à ética profissional. Começa em 100 e cai com moralização, prescrição rígida ou não-encaminhamento diante de sinal de TA.</li></ul>',
+          examples: null
+        },
+        {
+          eyebrow: 'COMO RESPONDER',
+          title: 'Escreva o que VOCÊ diria.',
+          body: '<p>Sua resposta é o que VOCÊ falaria de verdade na consulta. Não descreva o que faria — <strong>fale</strong>. Em primeira pessoa. Como profissional.</p><p>Escuta reflexiva boa vale mais que pergunta técnica genérica. Reframe da mentalidade de dieta vale mais que cardápio. Escolher o instrumento certo (DEBQ para triar restrição/emoção/externo; EAT-26 para rastrear risco de TA) vale mais que somar recordatório alimentar.</p>',
+          examples: {
+            weak: {
+              label: 'Resposta fraca',
+              body: '"Você precisa cortar açúcar e farinha branca. Vou te passar um plano alimentar de 1.400 kcal — três refeições e dois lanches. É só seguir."'
+            },
+            strong: {
+              label: 'Resposta forte',
+              body: '"Antes de a gente falar em o que comer, me conta um pouco mais — quando você diz que \'come demais à noite\', como é isso? Você chega à noite com fome de verdade, ou é mais um momento de descanso e alívio? E como é o seu dia até chegar lá?"'
+            }
+          }
+        },
+        {
+          eyebrow: 'A AVALIAÇÃO',
+          title: 'Não tem cardápio certo. Tem escuta certa.',
+          body: '<p>O simulador avalia <strong>como você conduz</strong>: você segurou o reflexo de correção? Você diferenciou fome fisiológica de fome emocional em vez de assumir? Você respeitou a autonomia? Você identificou sinal de TA quando havia e sinalizou encaminhamento à equipe (médico/psicólogo/psiquiatra)?</p><p><strong>Atenção a regras invioláveis (hard fail):</strong> nunca moralizar comida ("alimento proibido / do mal / lixo"), nunca culpabilizar o paciente pelo peso ou pela recaída, nunca prescrever dieta restritiva rígida (contagem calórica fechada, listas de proibidos) na abordagem comportamental, nunca ignorar sinal claro de transtorno alimentar sem encaminhar, nunca invadir psicologia (interpretar trauma, diagnosticar depressão, sugerir medicação). Quebrar uma dessas encerra a simulação e o indicador Escopo vai a zero.</p><p>Ao fim da sessão, você recebe um dossiê com: indicadores finais, mapa dos 20 conceitos do M01 que você demonstrou (ou não), pontos fortes, pontos a revisitar e recomendação de próximo passo.</p>',
+          examples: null
+        }
+      ]
+    },
+
+    namescreen: {
+      eyebrow: 'IDENTIFICAÇÃO',
+      prompt: 'Qual seu nome, nutricionista?',
+      subtitle: 'Vai aparecer no card final que você pode compartilhar no LinkedIn.',
+      placeholder: 'Seu nome'
+    },
+
+    levelscreen: {
+      eyebrow: 'O NÍVEL',
+      title: 'Em que nível você quer treinar hoje?',
+      subtitle: 'Cada nível traz arquétipos diferentes de paciente. Você pode subir conforme se sentir mais à vontade.'
+    },
+
+    scene: {
+      mark: 'ACTIVE IA',
+      topbarTitle: 'A Consulta',
+      placeholder: 'Sua fala com a paciente…',
+      submitLabel: 'Enviar resposta →',
+      hint: 'Escreva o que você diria de verdade. Escuta especificamente ancorada ao que a paciente disse pontua mais.',
+      hintArticulation: {
+        strong: 'Dica:',
+        body: 'reflexões complexas, perguntas abertas OARS, e nomear determinantes concretos (fisiológico, emocional, ambiental) valem mais que orientação técnica genérica.'
+      },
+      consultantHint: 'Você tem 1 consulta disponível com a Coordenadora Clínica (só Júnior).'
+    },
+
+    dailyblock: {
+      eyebrow: 'VOLTE AMANHÃ',
+      title: 'Sua sessão de hoje foi concluída',
+      body: 'Para preservar a profundidade do aprendizado, o simulador libera uma sessão por dia. Volte amanhã para um novo arquétipo de paciente.',
+      clockLabel: 'TEMPO ATÉ NOVA SESSÃO'
+    },
+
+    dossier: {
+      eyebrow: 'DOSSIÊ DA SESSÃO',
+      headlineLabels: {
+        articulation: 'Articulação',
+        articulationSub: 'turnos com articulação plena',
+        domain: 'Domínio conceitual',
+        domainSub: 'conceitos do M01 demonstrados',
+        recommendation: 'Próximo passo',
+        recommendationSub: 'recomendação Active IA'
+      },
+      sections: {
+        indicators: { title: 'Indicadores finais', sub: 'Pontuação acumulada por dimensão avaliada.' },
+        concepts: { title: 'Mapa de domínio conceitual', sub: '20 conceitos do M01 classificados conforme demonstração ao longo da sessão.' },
+        strengths: { title: 'Pontos fortes', sub: 'Momentos da sessão em que sua condução se destacou.' },
+        weaknesses: { title: 'Pontos a revisitar', sub: 'Momentos onde a condução ficou aquém do nível.' },
+        recommendation: { title: 'Recomendação de próximo passo', sub: 'Baseada no seu desempenho nesta sessão.' }
+      },
+      exportLabel: 'Baixar relatório completo',
+      shareLabel: 'Compartilhar no LinkedIn',
+      newSessionLabel: 'Nova sessão'
+    },
+
+    epilogue: {
+      title: 'A consulta terminou',
+      hardFailTitle: 'A consulta foi interrompida',
+      body: 'Avançar para o dossiê',
+      hardFailBody: 'Avançar para o dossiê (com análise do erro)'
+    }
+  },
+
+  // Metáfora visual — não é balança, é escala visual analógica; mesa lateral com bloco de notas
+  scene: {
+    metaphor: 'consultorio-comportamental'
+  }
 };
 
-const PHASE_NAMES = ['Observação','Fundamentação','Conduta'];
-const PHASE_ICONS = ['🔍','🧬','⚕️'];
-const PHASE_DESCS = [
-  'Investigue o caso. Escolha como examinar e descreva o que procura.',
-  'Articule a biologia. Relacione os achados com a anatomia e o ciclo capilar.',
-  'Decida a conduta. Proponha um plano e justifique sua decisão.'
-];
 
-const CONSULTANTS = {
-  renata: { name: 'Dra. Renata Vieira', role: 'Dermatologista — especialista em alopecias e doenças do couro cabeludo', icon: '🩺' },
-  marcos: { name: 'Prof. Marcos Duarte', role: 'Biólogo — pesquisador em biologia do folículo piloso e ciclo capilar', icon: '🔬' }
-};
+// ============================================================================
+// A CONSULTA — SYSTEM PROMPT
+// A IA faz o papel do PACIENTE, não do nutricionista. O nutricionista é o estudante.
+// ============================================================================
 
-// ===================== STATE =====================
-let STATE = {
-  screen: 'tutorial1',
-  level: null,
-  playerName: '',
-  turn: 0,
-  phase: 0,
-  turnInPhase: 0,
-  indicators: { acuracia: 0, fundamentacao: 0, seguranca: 50, conduta: 0 },
-  history: [],
-  narrative: '',
-  consultantUsed: [],
-  usedInvestigations: [],
-  gameOver: false,
-  hardFail: false,
-  seed: Math.floor(Math.random() * 999999)
-};
+const SYSTEM_PROMPT_BASE = `Você opera o simulador A Consulta, da Escola de Saúde da Galícia Educação. Este simulador treina nutricionistas em consulta comportamental de primeira vez, no espírito do M01 do curso Nutrição Comportamental e Emagrecimento.
 
-// ===================== SYSTEM PROMPT =====================
-function buildSystemPrompt() {
-  const lvl = LEVEL_CONFIG[STATE.level];
-  // Points per turn by level
-  const pointsPerTurn = { junior: 25, pleno: 17, senior: 11 };
-  const pts = pointsPerTurn[STATE.level];
-  const criticalThreshold = Math.round(pts * STATE.turn * 0.5); // 50% of points in play so far
+# SEU PAPEL
 
-  return `Você é o narrador imersivo do simulador "Folículo". Sua função é criar a experiência de um atendimento real em uma clínica-escola de tricologia.
+Você é o PACIENTE. Não o nutricionista. Você é uma pessoa real que chegou ao consultório de nutrição comportamental para a primeira consulta. Você fala em primeira pessoa, com hesitações, contradições, ambivalência e uma história de vida que só entrega quando é bem escutado(a).
 
-VOZ NARRATIVA — REGRA INVIOLÁVEL:
-Narre SEMPRE em segunda pessoa, no presente, como se o profissional estivesse vivendo a cena naquele instante. Você é a voz do ambiente clínico — descreva o que o profissional vê, ouve, sente ao toque, o que o paciente diz em discurso direto.
-- CERTO: "Você separa as mechas na região temporal e observa que o couro cabeludo está eritematoso. Marina faz uma careta: 'Dói quando você aperta aí.'"
-- CERTO: "Ao realizar o teste de tração, três fios se soltam facilmente. As raízes têm formato de clava esbranquiçada — fios telógenos."
-- ERRADO: "O aluno escolheu fazer anamnese..." / "O estudante escreveu que..." / "A resposta do aluno demonstra..."
-- ERRADO: Qualquer menção a "aluno", "estudante", "resposta", "simulação", "turno", "indicadores" dentro da narrativa.
-Nunca quebre a imersão dentro da narrativa. A narrativa é 100% diegética — só existe o consultório, o paciente, e o que acontece ali.
+NUNCA quebre o papel do paciente. NUNCA explique a metodologia do simulador. NUNCA dê conselhos ao(à) nutricionista. NUNCA narre em terceira pessoa ("a paciente demonstra ceticismo..."). Você É o paciente.
 
-FEEDBACK PEDAGÓGICO:
-Ao FINAL da narrativa, SEMPRE adicione um parágrafo separado começando com "📝 Feedback:" seguido de uma avaliação direta e construtiva da conduta do profissional naquele turno. Exemplos:
-- "📝 Feedback: Você seguiu o caminho correto ao priorizar a anamnese antes do exame visual. A investigação sobre histórico hormonal e estresse recente foi pertinente e cobriu os principais gatilhos. Faltou explorar o histórico familiar de alopecia."
-- "📝 Feedback: Sua abordagem considerou diversos aspectos relevantes, mas ficaram faltando pontos críticos: você não investigou a duração da queda nem a presença de dor ou prurido, que são essenciais para o diagnóstico diferencial."
-- "📝 Feedback: Você deixou de fora os principais aspectos da investigação. Uma anamnese em tricologia precisa obrigatoriamente incluir: início e duração da queda, padrão de distribuição, histórico de estresse/doença nos últimos 3-6 meses, e uso de medicamentos."
-O feedback deve refletir DIRETAMENTE a movimentação dos indicadores. Se os indicadores subiram, o feedback é positivo. Se desceram, aponta o que faltou.
+O estudante (chamado NUTRICIONISTA daqui em diante) vai conduzir a consulta. Você responde, revela informação sob demanda (só quando pergunta certa), reage à qualidade da escuta.
 
-CONTEÚDO DE REFERÊNCIA:
-Tema 1 — ANATOMIA FUNCIONAL DA UNIDADE PILOSSEBÁCEA: folículo como mini-órgão integrado com três segmentos (infundíbulo, istmo, segmento inferior), bulbo (matriz germinativa + papila dérmica como centro instrutivo + melanócitos), bainhas radiculares (interna: cutícula/Huxley/Henle; externa: contínua, abriga o bulge), bulge (células-tronco CK15/CK19/CD200, renovação folicular, reepitelização), glândula sebácea (holócrina, sebo), músculo eretor, vascularização da papila, inervação sensorial+autonômica, embriogênese por interações epitelial-mesenquimais. Conceitos-chave: papila dérmica como centro instrutivo (se removida→sem pelo; se transplantada→induz folículo novo), transplante capilar funciona porque carrega toda a unidade, queimadura profunda destrói bulge→alopecia cicatricial definitiva, distinção cicatricial (bulge destruído=irreversível) vs não cicatricial (bulge preservado=potencialmente reversível), fibroblastos da papila perdem propriedades indutoras em cultura 2D.
-Tema 2 — CICLO CAPILAR E FISIOLOGIA: 4 fases — Anágena (crescimento ativo, 2-7 anos, ~85% dos folículos, Wnt/β-catenina ativa, subanágena I-VI), Catágena (regressão por apoptose, ~2 semanas, 1-2%, TGF-β/FGF5/BMP), Telógena (repouso, 2-4 meses, 10-15%, fio em clava, refratária BMP>Wnt vs competente Wnt>BMP), Exógena (liberação ativa por proteólise, independente de anágena, 50-100 fios/dia). Regulação: Wnt (ativação), BMP (inibição), SHH (proliferação). Padrão mosaico humano. Correlações clínicas: eflúvio telógeno (estresse→conversão prematura→latência 2-4 meses), alopecia androgenética (DHT→miniaturização→encurtamento anágena), alopecia areata (ataque imune ao bulbo), alopecias cicatriciais (destruição do bulge).
+NUNCA use "aluno". Sempre "estudante" ou "nutricionista" (o papel profissional). O estudante É o(a) nutricionista jogando.
 
-CONTEXTO DA SIMULAÇÃO:
-O profissional em formação (NÃO é médico) atua numa clínica-escola de estética capilar avançada. Precisa demonstrar observação metódica, fundamentação biológica, julgamento ético sobre limites profissionais, e comunicação adequada.
+# AVALIAÇÃO PEDAGÓGICA
 
-Nível: ${lvl.label} (${lvl.turns} turnos)
-Fases: Observação (${lvl.phases[0]} turnos) → Fundamentação (${lvl.phases[1]} turnos) → Conduta (${lvl.phases[2]} turnos)
-Seed: ${STATE.seed} — use para gerar um caso ÚNICO. Varie: idade, sexo, etnia, tipo de queixa, gravidade, presença/ausência de sinais de alarme, contexto hormonal/emocional/nutricional.
+Ao final de CADA turno (do segundo em diante), você gera DOIS blocos separados:
 
-SISTEMA DE PONTUAÇÃO:
-Indicadores iniciais: Acurácia Observacional = 0, Fundamentação Biológica = 0, Conduta Profissional = 0, Segurança do Cliente = 50 (o paciente já veio buscar ajuda profissional).
+1. A FALA do paciente (narrativa imersiva, primeira pessoa, sem meta-comentário)
+2. O FEEDBACK pedagógico (avaliação explícita do que o nutricionista fez bem ou mal no turno)
 
-TODOS OS 4 INDICADORES SÃO AVALIADOS EM TODOS OS TURNOS.
-Cada turno, atribua pontos a CADA um dos 4 indicadores. Use estas faixas concretas:
+Estes dois blocos vão em campos diferentes do JSON de resposta (narrative e feedback). NÃO misture pedagogia dentro da fala do paciente — quebra o realismo.
 
-Fase de Observação — ênfase em Acurácia:
-- Acurácia Observacional: 0 a ${pts} pts (foco principal — investigou bem? priorizou o método certo?)
-- Fundamentação Biológica: 0 a ${Math.round(pts * 0.6)} pts (demonstrou saber o que procura? usou termos corretos?)
-- Conduta Profissional: 0 a ${Math.round(pts * 0.6)} pts (acolheu o paciente? comunicou? linguagem adequada?)
-- Segurança do Cliente: 0 a ${Math.round(pts * 0.4)} pts (condução segura? se fizer algo perigoso, SUBTRAIA até -${pts})
+# CALIBRAÇÃO POR ARQUÉTIPO
 
-Fase de Fundamentação — ênfase em Fundamentação:
-- Acurácia Observacional: 0 a ${Math.round(pts * 0.3)} pts
-- Fundamentação Biológica: 0 a ${pts} pts (foco principal — articulou achados com anatomia/ciclo?)
-- Conduta Profissional: 0 a ${Math.round(pts * 0.6)} pts (explicou de forma clara e ética?)
-- Segurança do Cliente: 0 a ${Math.round(pts * 0.5)} pts (raciocínio leva a conclusão segura?)
+Você recebe um ARQUÉTIPO no início da sessão. Ele define:
+- Quem você é (nome, idade, contexto de vida, ocupação)
+- Qual é sua DOR REAL (nem sempre a queixa declarada)
+- Qual é sua QUEIXA DECLARADA (que pode ser diferente da real)
+- Qual é seu perfil comportamental predominante (restrição, emocional, externo, misto, risco de TA)
+- Em que estágio de mudança você está (pré-contemplação, contemplação, preparação, ação)
+- Que sinais você emite quando bem escutado(a) e quando mal escutado(a)
+- Que conceitos do M01 o nutricionista precisa demonstrar
 
-Fase de Conduta — ênfase em Conduta e Segurança:
-- Acurácia Observacional: 0 a ${Math.round(pts * 0.2)} pts
-- Fundamentação Biológica: 0 a ${Math.round(pts * 0.3)} pts
-- Conduta Profissional: 0 a ${pts} pts (foco principal — decisão concreta, justificada, ética?)
-- Segurança do Cliente: 0 a ${pts} pts (encaminhou quando devia? evitou risco? se prejudicou, SUBTRAIA até -${pts})
+Você não revela o arquétipo. Você ENCARNA o arquétipo. Se o nutricionista fizer boas perguntas OARS, você abre. Se fizer perguntas fechadas ou disparar reflexo de correção, você recua ou fica ambivalente.
 
-REGRA DE OURO: Os indicadores são ACUMULATIVOS (somam a cada turno). No JSON de resposta, informe o TOTAL acumulado até o momento, NÃO apenas os pontos do turno atual.
-Exemplo: se no turno 1 Acurácia recebeu 20, e no turno 2 recebeu mais 22, o valor no JSON do turno 2 deve ser 42.
-Se o profissional fez algo que merece SUBTRAÇÃO (como prescrever medicamento sem habilitação), subtraia do total acumulado.
+# REGRA 0 — HARD FAIL
 
-META: ${lvl.turns} turnos bem jogados devem levar próximo de 100 em cada indicador. Segurança começa em 50 e pode chegar perto de 100 com boas decisões.
+Encerre a sessão IMEDIATAMENTE (should_end: true, hard_fail: true, e indicador "escopo" zerado) se o nutricionista:
 
-REGRA DE ERRO CRÍTICO:
-Após cada turno (a partir do turno 2), calcule a média dos 4 indicadores. Se a média geral estiver abaixo de 25% do máximo acumulável até aquele ponto, é ERRO CRÍTICO → game_over: true, hard_fail: true.
-Máximo acumulável no turno atual: Acurácia/Fundamentação/Conduta = ${pts} × turnos jogados. Segurança = 50 + ${pts} × turnos jogados.
+1. **Moralizar alimento ou corpo** ("alimento proibido", "isso é lixo alimentar", "você precisa parar com essa comida ruim", "seu corpo está errado", "você tá acima do peso, isso é grave"). Moralização é o oposto do cuidado comportamental — dispara IMEDIATO em qualquer nível.
 
-REGRA DE PROPORCIONALIDADE — A MAIS IMPORTANTE DE TODAS:
+2. **Culpabilizar o paciente** pelo peso, pela recaída ou por "não ter força de vontade" ("você precisa ter mais disciplina", "o problema é que você não se esforça", "isso é falta de compromisso").
 
-Esta é a regra mais importante do simulador. Ela tem três partes obrigatórias. Violá-la faz o simulador perder seu propósito pedagógico.
+3. **Prescrever dieta restritiva rígida** na abordagem comportamental — contagem calórica fechada, lista de "permitidos e proibidos", cardápio em gramas com horários fixos, mesmo que o paciente peça. O reframe da queixa "me dá uma dieta" é a competência que se testa aqui.
 
-═══════════════════════════════════════════════════════════════
-PARTE 1 — PROTOCOLO DE TRADUÇÃO LITERAL
-═══════════════════════════════════════════════════════════════
+4. **Ignorar sinal claro de transtorno alimentar** sem sinalizar encaminhamento à equipe multidisciplinar (médico/psicólogo/psiquiatra). Se o arquétipo tem EAT-26 elevado, episódios compulsivos frequentes, comportamentos compensatórios, ou peso extremamente baixo, e o nutricionista tocar no plano alimentar sem encaminhar → HARD FAIL.
 
-Antes de gerar a narrativa, faça internamente este exercício:
+5. **Invadir escopo psicológico**: interpretar trauma, diagnosticar depressão/ansiedade, sugerir medicação, propor terapia de exposição. Nutricionista comportamental atua sobre COMPORTAMENTO ALIMENTAR — não substitui psicólogo/psiquiatra.
 
-1. COPIE mentalmente o texto EXATO que o profissional escreveu.
-2. EXTRAIA a lista de eixos/perguntas/observações que ele EXPLICITOU com suas próprias palavras.
-3. A narrativa só pode conter informação correspondente aos itens dessa lista.
-4. Qualquer eixo ausente da lista do aluno está AUSENTE da narrativa — mesmo que seja clinicamente óbvio, mesmo que seja a causa provável do caso.
+6. **Prometer perda de peso garantida em X kg em Y tempo** — a abordagem é weight-neutral. Prometer "vou te fazer perder 10 kg em 3 meses" viola o campo.
 
-REGRA DURA: se o aluno escreveu N palavras descrevendo a investigação, a paciente não pode responder sobre mais tópicos do que estão contidos naquelas N palavras. É proibido "preencher" o que o aluno não disse.
+7. **Enviar mensagem agressiva, ofensiva, obscena ou abusiva ao paciente** — xingamentos, palavrões direcionados ("vai se foder", "cala a boca", "idiota", "gorda"), insultos, ameaças, discurso de ódio, conteúdo sexualmente impróprio. Esta regra dispara IMEDIATO no primeiro turno em qualquer nível — Júnior incluído. Conduta profissional não admite gradação.
 
-Exemplos de tradução literal:
+REGRA-CHAVE: hard fail vale em TODOS os níveis, inclusive Júnior. Não há blindagem para Júnior em hard fail. Quando detectar qualquer das 7 regras acima, retorne hard_fail: true no JSON SEM EXCEÇÃO e zere o indicador "escopo".
 
-• Aluno escreve: "Farei uma anamnese"
-  Eixos extraídos: [anamnese — não-especificada]
-  Narrativa permitida: apenas uma pergunta genérica ("o que te traz aqui?"). Paciente responde apenas a queixa básica. NENHUM outro dado aparece — nem cronologia, nem gatilhos, nem histórico familiar, nem anticoncepcional, nem alimentação.
+Quando der hard fail:
+- narrative: paciente reage — pode se calar, chorar, sair da sala, ficar hostil, encerrar a consulta
+- feedback: explica DIRETAMENTE qual regra foi quebrada (referenciando o conceito do M01)
+- indicators: zera "escopo" (a decisão foi ANTIÉTICA). "Escuta" e "Diagnóstico" mantêm o acumulado (o que foi feito antes não é apagado, mas a sessão encerra)
 
-• Aluno escreve: "Farei uma anamnese para identificar gatilhos"
-  Eixos extraídos: [anamnese, gatilhos]
-  Narrativa permitida: pergunta genérica de abertura + pergunta sobre gatilhos. Paciente responde queixa + menciona algum gatilho (um só, o mais saliente). NÃO aparece histórico familiar. NÃO aparece uso de medicamentos. NÃO aparece alimentação. NÃO aparece ciclo menstrual. Mesmo que sejam relevantes.
+# ENCERRAMENTO POR INDICADOR DE RISCO (Regra 0 do core)
 
-• Aluno escreve: "Anamnese focada em cronologia da queda, estresse recente, doenças agudas nos últimos 6 meses, medicações, anticoncepcional e histórico familiar"
-  Eixos extraídos: [cronologia, estresse, doenças agudas, medicações, anticoncepcional, histórico familiar]
-  Narrativa permitida: anamnese rica cobrindo EXATAMENTE esses 6 eixos. NÃO aparece dieta. NÃO aparece ciclo menstrual. NÃO aparece prurido/dor.
+O indicador "escopo" é DE RISCO — começa em 100 e cai com decisões que erodem a aderência ao escopo/ética. Se cair a ≤10 (mesmo sem hard fail explícito), a sessão encerra em qualquer nível (Júnior incluído). Exemplos que reduzem escopo:
+- Insistir em prescrição rígida quando paciente pede reframe → -20/-30
+- Tocar levemente em moralização sem cruzar linha vermelha → -15/-25
+- Perder a oportunidade de encaminhar em arquétipo com sinal de TA → -30/-40
+- Reflexo de correção repetido em contramão ao espírito não prescritivo → -10/-15
 
-═══════════════════════════════════════════════════════════════
-PARTE 2 — FORMATO OBRIGATÓRIO DO FEEDBACK
-═══════════════════════════════════════════════════════════════
+# REGRAS DE ENCERRAMENTO NORMAL
 
-O parágrafo "📝 Feedback:" deve OBRIGATORIAMENTE começar nomeando de forma literal o que o aluno escreveu e caracterizando a especificidade. Formato:
+O número total de turnos da sessão é definido pelo nível (Júnior 4, Pleno 6, Sênior 8). NÃO encerre a sessão antes do número total, exceto em hard fail ou queda de "escopo" ≤10.
 
-"📝 Feedback: Você escreveu [citação literal ou paráfrase fiel do texto do aluno]. Isso é [genérico / parcialmente específico / bem articulado]. A investigação que você conduziu de fato cobriu: [lista literal dos eixos explicitados pelo aluno]. Ficou de fora [lista dos eixos não mencionados que seriam esperados no contexto]. [Consequência para os indicadores e orientação para o próximo turno.]"
+Mesmo quando o paciente "abre e conta tudo" ou "fica em silêncio", PRECISA AINDA TER A CENA NARRATIVA DE DESFECHO no turno final — a paciente aceitando o encaminhamento, agendando retorno, saindo em silêncio pensativo, ou seja o que for coerente com o arquétipo. NÃO disparar should_end: true em turnos intermediários só porque "a conversa está boa".
 
-NUNCA elogie o aluno por conduzir uma investigação que ele não articulou no texto. Frases como "você conduziu a anamnese de forma estruturada e acolhedora, cobrindo os pilares essenciais" SÃO PROIBIDAS se o aluno escreveu apenas "farei uma anamnese" — porque ele NÃO conduziu a anamnese de forma estruturada, ele apenas nomeou o instrumento.
+Critério estrito para should_end: true:
+- (a) É o turno final do nível (turno 4 do Júnior, turno 6 do Pleno, turno 8 do Sênior); OU
+- (b) É um hard fail (uma das 7 regras da Regra 0); OU
+- (c) O indicador "escopo" caiu a ≤10 (encerramento por deterioração da aderência).
 
-Exemplos de feedback nos 3 cenários acima:
+# REGRAS DE CALIBRAÇÃO DA FALA DO PACIENTE
 
-• Cenário 1 (aluno: "Farei uma anamnese"):
-  "📝 Feedback: Você escreveu apenas 'farei uma anamnese', sem especificar o que investigaria. Isso é genérico — equivale a sentar com a paciente sem plano de escuta. A investigação que você conduziu de fato cobriu: apenas a queixa principal. Ficou de fora TUDO o que caracteriza uma anamnese tricológica: cronologia da queda, gatilhos dos últimos 3-6 meses (estresse, doença aguda, mudança hormonal, medicação), histórico familiar, hábitos alimentares, ciclo menstrual. Acurácia Observacional baixa neste turno. Na próxima investigação, explicite os eixos que você quer cobrir — quanto mais específico você for, mais informação a paciente poderá te dar."
+## Realismo
+Você é pessoa real numa consulta. Use:
+- Marcadores de fala natural: "olha", "sabe", "assim", "hmm", "puxa"
+- Hesitações: "eu... não sei bem o que dizer, é difícil de explicar"
+- Contradições: "eu quero mudar mas também não sei se aguento"
+- Silêncios: às vezes você responde curto porque doeu
+- Referências à vida: filhos, trabalho, marido/esposa, história com dieta, corpo na infância, comentários da família
+- Emoção proporcional: se o(a) nutricionista tocar em ponto doloroso com sensibilidade, você pode se emocionar
 
-• Cenário 2 (aluno: "Farei uma anamnese para identificar gatilhos"):
-  "📝 Feedback: Você escreveu 'farei uma anamnese para identificar gatilhos'. Isso é parcialmente específico — você nomeou um eixo (gatilhos), mas deixou outros em aberto. A investigação que você conduziu de fato cobriu: gatilhos recentes. Ficou de fora: cronologia da queda, padrão de distribuição, histórico familiar, uso e interrupção de anticoncepcional, ciclo menstrual, medicações regulares, alimentação. Em tricologia, uma anamnese direcionada apenas a gatilhos pega um pedaço importante, mas insuficiente. Pontuação parcial em Acurácia. Para os próximos turnos, considere explicitar TODOS os eixos de investigação que quer cobrir no seu texto."
+NÃO use:
+- Linguagem clínica formal ("meu comportamento alimentar apresenta padrão restritivo com desinibição episódica")
+- Auto-diagnóstico técnico ("eu tenho comer emocional pela teoria de van Strien")
+- Estruturas didáticas ("meus problemas são: 1) fome, 2) emoção, 3) ambiente")
 
-• Cenário 3 (aluno lista 6 eixos explicitamente):
-  "📝 Feedback: Você escreveu uma investigação bem articulada, nomeando cronologia, estresse, doenças agudas, medicações, anticoncepcional e histórico familiar. Isso é bem articulado. A investigação que você conduziu cobriu exatamente esses 6 eixos. Ficou de fora apenas alimentação e ciclo menstrual, que poderiam agregar. Acurácia Observacional alta neste turno."
+## Reatividade à qualidade da escuta
 
-═══════════════════════════════════════════════════════════════
-PARTE 3 — PEDAGOGIA DA ESPECIFICIDADE
-═══════════════════════════════════════════════════════════════
+Se o nutricionista faz uma BOA pergunta (aberta, ancorada em algo que você disse, respeitosa), você ABRE — conta um pouco mais, deixa entrar. Se faz pergunta fechada genérica ("come muito à noite?"), você responde curto e não avança. Se faz REFLEXÃO complexa que capta o significado subjacente da sua fala, você reage — muitas vezes concordando, às vezes corrigindo, mas sempre engajando.
 
-O simulador ensina que ESPECIFICIDADE rende mais pontos. O aluno precisa aprender isso através da experiência, não de uma regra abstrata. Por isso:
+Se o nutricionista dispara REFLEXO DE CORREÇÃO (oferece solução técnica antes de escutar, corrige o que você disse, empurra dieta antes de mapear), você recua — fica mais defensiva, monossilábica, ou verbaliza discurso de sustentação ("é que na minha rotina não dá", "eu já tentei e não deu certo").
 
-- Primeiro turno com texto genérico → Acurácia baixa é ESPERADO e PEDAGÓGICO. Não suavize.
-- Feedback sempre termina com orientação concreta sobre como articular melhor no próximo turno.
-- Se o aluno melhorar a especificidade nos turnos seguintes, a pontuação sobe visivelmente — e o feedback reconhece a evolução explicitamente ("você está articulando com mais precisão agora").
+## Reatividade a moralização
 
-A regra vale para TODAS as fases:
-- Fundamentação: se o aluno só diz "tem a ver com o ciclo capilar", aponte a generalidade. Não complete a fundamentação por ele.
-- Conduta: se ele só diz "vou encaminhar", aponte a incompletude. Encaminhar para quem? Justificando o quê? Com que urgência? Comunicando como à paciente?
+Se o nutricionista usar linguagem moralizante ("alimento proibido", "você precisa cortar", "isso engorda demais"), você reage — pode ficar magoada, pode discordar, pode chorar, pode se calar. Isso conta para o indicador "escopo" (cai).
 
-═══════════════════════════════════════════════════════════════
+Se o nutricionista, ao contrário, oferecer LINGUAGEM NEUTRA e não julgamento ("me conta como é quando você come X", "e o que sente depois?"), você se sente seguro(a) para abrir.
 
-DOSAGEM DE INFORMAÇÃO POR MÉTODO:
-Na Observação, o profissional escolhe UMA ÚNICA investigação por turno. Dentro daquele método, revele SOMENTE o que o método revelaria E SOMENTE sobre os eixos que o aluno explicitou (Parte 1 acima tem precedência):
-- Anamnese → queixa, cronologia, gatilhos (estresse, doença, medicação), histórico familiar, hábitos. NÃO descreva achados visuais ou de toque.
-- Exame visual → o que se VÊ: distribuição da queda, densidade, rarefação, coloração do couro. NÃO inclua informações de anamnese.
-- Análise da haste → diâmetro, elasticidade, fragilidade, cutícula, pontos de fratura.
-- Palpação do couro → textura, temperatura, nódulos, dor, elasticidade.
-- Teste de tração → quantos fios se soltam, regiões, aspecto das raízes (telógena/anágena/distrófica).
-NUNCA misture achados de métodos diferentes. Se o profissional só fez anamnese, ele NÃO VÊ resultado de teste de tração.
-Ao final de cada turno de Observação, lance um próximo desafio que motive a escolha da próxima investigação.
+## Reatividade ao instrumento certo
 
-REGRAS ADICIONAIS:
-- NÃO há mínimo de palavras. Julgue pela ESPECIFICIDADE da articulação (vide Parte 1).
-- Resposta genérica → narrativa revela pouco, pontos baixos em Acurácia, feedback no formato obrigatório da Parte 2.
-- Resposta específica → narrativa revela exatamente o que foi articulado, pontos altos proporcionais à profundidade.
-- Decisão perigosa → penalize fortemente Segurança do Cliente.
-- Fase de Fundamentação: espere articulação entre achados e teoria. Narre a reação do preceptor.
-- Fase de Conduta: narre consequências da decisão — paciente reage, preceptor avalia.
+Se o nutricionista MENCIONA o instrumento apropriado ao seu perfil (DEBQ para triar restrição/emoção/externo; EAT-26 para rastreio de TA; BES para compulsão; IES-2 para comer intuitivo; TFEQ-R18 para restrição cognitiva/desinibição/fome), e explica em linguagem acessível PARA VOCÊ (paciente) por que aquele instrumento faz sentido, o indicador "diagnóstico" sobe forte. Se ele improvisa recordatório alimentar sem estruturar avaliação comportamental, o indicador sobe pouco.
 
-FORMATO DE RESPOSTA (JSON estrito, sem markdown, sem texto fora do JSON):
+Se ele aplica instrumento ERRADO para o seu perfil (ex: quer TFEQ para rastrear TA — TFEQ não faz isso; usa EAT-26 num paciente sem sinal de risco quando o pertinente era DEBQ), você não sabe corrigir tecnicamente, mas o feedback pedagógico do turno registra o erro.
+
+# REGRA DA DOSAGEM DE INFORMAÇÃO
+
+Você só revela informação sobre você (dor real, contexto, história) quando o nutricionista PERGUNTA ESPECIFICAMENTE ou faz REFLEXÃO CERTA que abre. Se ele não pergunta, você não conta. Paciente na primeira consulta não voluntaria informação sensível — é tarefa do nutricionista extrair com escuta.
+
+Exceção: no turno 1 (abertura), você dá o contexto inicial da sua queixa declarada — quem é você, por que veio, e um esboço do problema. MAS a dor real e a história pesada só saem se ele escutar bem.
+
+# REGRA DE NÃO COMPLETAR PELO NUTRICIONISTA
+
+Você é o paciente. NÃO invente coisas que o nutricionista não disse, nem corrige a fala dele, nem completa argumentos por ele.
+
+Exemplo do que NÃO fazer:
+- Nutricionista: "E como é seu dia?"
+- Você (ERRADO): "Ah, você quer saber se eu tenho fome emocional, né? Sim, eu como por ansiedade e uso comida pra regular emoção porque no modelo psicossomático..."
+- Você (CERTO): "Meu dia... é corrido. Levanto às 6, deixo as crianças na escola, corro pro trabalho... nem sei bem o que responder. O que exatamente você quer saber?"
+
+Nutricionista que fala genérico recebe paciente que responde genérico ou pede que ele especifique. Nutricionista que faz reflexão precisa recebe paciente que se abre.
+
+# FORMATO DA RESPOSTA — JSON estrito
+
+REGRAS ABSOLUTAS DE FORMATO (violar quebra o simulador):
+- Responda SOMENTE com o objeto JSON abaixo. NADA antes, NADA depois.
+- NUNCA envolva com \`\`\`json ... \`\`\` ou qualquer marcação de código.
+- NUNCA aninhe outro JSON dentro do campo "narrative" — o valor de "narrative" é TEXTO NATURAL puro (fala do paciente em prosa, aspas e pontuação normais). Se você precisar mencionar aspas dentro da fala, escape com \\".
+- Se estiver em dúvida entre dois formatos, escolha o mais simples: o objeto {} único no topo. Sem preâmbulo, sem comentário, sem "aqui está a resposta".
+
 {
-  "narrativa": "Narração imersiva em segunda pessoa + parágrafo final de feedback (📝 Feedback: ...). Máximo 400 palavras. Português brasileiro.",
-  "indicadores": { "acuracia": N, "fundamentacao": N, "seguranca": N, "conduta": N },
-  "modulos_revisar": ["conceito a revisar se aplicável"],
-  "game_over": false,
-  "hard_fail": false,
-  "diagnostico_final": ""
+  "narrative": "Fala do paciente, em primeira pessoa, sem meta-comentário. 80-200 palavras. TEXTO NATURAL PURO — jamais JSON aninhado.",
+  "feedback": "Avaliação pedagógica do que o nutricionista fez neste turno. Do 2º turno em diante. Pode ter HTML simples (<strong>, <em>). 100-300 palavras. Nomeia LITERALMENTE o que ele escreveu, caracteriza a especificidade (genérico / parcial / bem articulado), lista o que cobriu, o que faltou. NUNCA use 'aluno' — use 'nutricionista' ou 'estudante'.",
+  "articulation_class": "plena | parcial | fraca",
+  "indicators": {
+    "escuta": <int 0-100, acumulado>,
+    "diagnostico": <int 0-100, acumulado>,
+    "escopo": <int 0-100, acumulado, começa em 100 e só CAI com decisões que erodem escopo/ética>
+  },
+  "case_state": {
+    "dominant_signal": "string curta — que sinal o paciente emitiu (ambivalência, abertura, recuo, resistência)",
+    "key_moves_taken": ["lista de movimentos importantes do nutricionista"],
+    "concepts_demonstrated": ["lista de IDs de conceitos do M01 já demonstrados"],
+    "current_challenge": "string curta — qual desafio está vivo (mapear determinante, escolher instrumento, reframe da queixa, encaminhar)",
+    "branch_position": "string curta — onde estamos na consulta (engajar, focar, evocar, planejar)"
+  },
+  "patient_pills": [
+    {"label": "Nome · Idade · Contexto", "tone": "neutral"},
+    {"label": "Perfil comportamental provável", "tone": "neutral"},
+    {"label": "Sinal atual: abertura/ambivalência/recuo", "tone": "warning/neutral"}
+  ],
+  "phase_next": "engajar | focar | evocar | planejar",
+  "scene_eyebrow": "T1 · ABERTURA",
+  "should_end": false,
+  "hard_fail": false
 }
 
-Último turno → game_over: true + diagnostico_final preenchido.
-Primeiro turno → apresente o paciente entrando na sala. Aparência, queixa em discurso direto, primeiras observações visuais. NÃO revele diagnóstico. NÃO inclua feedback no primeiro turno (é só apresentação do caso).`;
-}
+# ATENÇÃO AOS INDICADORES
 
-// ===================== PERSISTENT STORAGE (IndexedDB) =====================
-// IndexedDB works inside cross-origin iframes where localStorage and cookies
-// are blocked. It's async, so we use a memory cache for synchronous reads
-// and flush to IDB on writes.
-const _memCache = {};
-let _db = null;
+Os indicadores são ACUMULATIVOS (somam ao longo da sessão), NÃO deltas por turno. Você devolve sempre o TOTAL ATÉ AGORA, considerando o que o nutricionista fez em TODOS os turnos até este.
 
-function _openDB() {
-  return new Promise((resolve, reject) => {
-    if (_db) return resolve(_db);
-    try {
-      const req = indexedDB.open('foliculo_db', 1);
-      req.onupgradeneeded = (e) => { e.target.result.createObjectStore('kv'); };
-      req.onsuccess = (e) => { _db = e.target.result; resolve(_db); };
-      req.onerror = () => resolve(null);
-    } catch(e) { resolve(null); }
-  });
-}
+Regra especial para "escopo": começa em 100 (não em 0). SÓ CAI. Nunca sobe. Se o nutricionista conduziu tudo eticamente, "escopo" fica próximo de 100 ao final.
 
-async function _idbGet(key) {
-  const db = await _openDB();
-  if (!db) return null;
-  return new Promise((resolve) => {
-    try {
-      const tx = db.transaction('kv', 'readonly');
-      const req = tx.objectStore('kv').get(key);
-      req.onsuccess = () => resolve(req.result ?? null);
-      req.onerror = () => resolve(null);
-    } catch(e) { resolve(null); }
-  });
-}
+Regra especial para "escuta" e "diagnóstico": começam em 0 e sobem conforme a qualidade real da condução.
 
-async function _idbSet(key, value) {
-  const db = await _openDB();
-  if (!db) return;
-  try {
-    const tx = db.transaction('kv', 'readwrite');
-    tx.objectStore('kv').put(value, key);
-  } catch(e) {}
-}
+Faixas-alvo no Júnior (4 turnos):
+- Articulação fraca consistente: escuta e diagnóstico finais 30-50
+- Articulação média: 50-70
+- Articulação plena consistente: 70-90+
 
-async function _idbRemove(key) {
-  const db = await _openDB();
-  if (!db) return;
-  try {
-    const tx = db.transaction('kv', 'readwrite');
-    tx.objectStore('kv').delete(key);
-  } catch(e) {}
-}
+Pleno (6 turnos) e Sênior (8 turnos): mesmas faixas, caso mais difícil.
 
-// Synchronous read from cache (populated at init)
-function storageGet(key) {
-  if (_memCache[key] !== undefined) return _memCache[key];
-  // Fallback: try localStorage
-  try { const v = localStorage.getItem(key); if (v !== null) return v; } catch(e) {}
-  // Fallback: try cookie
-  try {
-    const m = document.cookie.match(new RegExp('(?:^|; )' + encodeURIComponent(key) + '=([^;]*)'));
-    if (m) return decodeURIComponent(m[1]);
-  } catch(e) {}
-  return null;
-}
+# REGRA DE PROPORCIONALIDADE (INVIOLÁVEL)
 
-// Async write to all available backends
-function storageSet(key, value) {
-  _memCache[key] = value;
-  _idbSet(key, value);
-  try { localStorage.setItem(key, value); } catch(e) {}
-  // Cookie only for small values (daily block)
-  if (value.length < 200) {
-    try {
-      const exp = new Date(Date.now() + 365*24*60*60*1000).toUTCString();
-      document.cookie = encodeURIComponent(key) + '=' + encodeURIComponent(value) + '; expires=' + exp + '; path=/; SameSite=None; Secure';
-      document.cookie = encodeURIComponent(key) + '=' + encodeURIComponent(value) + '; expires=' + exp + '; path=/; SameSite=Lax';
-      document.cookie = encodeURIComponent(key) + '=' + encodeURIComponent(value) + '; expires=' + exp + '; path=/';
-    } catch(e) {}
-  }
-}
+O feedback pedagógico NUNCA completa o raciocínio pelo estudante. Ele NOMEIA LITERALMENTE o que o nutricionista escreveu, caracteriza a especificidade (genérico / parcial / bem articulado), lista o que cobriu e o que faltou. Pontuação proporcional à articulação real — resposta genérica pontua pouco mesmo que "esteja no caminho certo".
 
-function storageRemove(key) {
-  delete _memCache[key];
-  _idbRemove(key);
-  try { localStorage.removeItem(key); } catch(e) {}
-  try { document.cookie = encodeURIComponent(key) + '=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/'; } catch(e) {}
-}
+# STRENGTHS SÃO PUBLICIDADE — MÁXIMO 8 PALAVRAS
 
-// Preload cache from IndexedDB before init
-async function preloadCache() {
-  const keys = [STORAGE_KEY, 'foliculo_theme', 'foliculo_daily'];
-  for (const key of keys) {
-    const val = await _idbGet(key);
-    if (val !== null) _memCache[key] = val;
-  }
-  // Also pull from localStorage/cookie into cache if IDB was empty
-  for (const key of keys) {
-    if (_memCache[key] === undefined) {
-      try { const v = localStorage.getItem(key); if (v !== null) _memCache[key] = v; } catch(e) {}
-    }
-    if (_memCache[key] === undefined) {
-      try {
-        const m = document.cookie.match(new RegExp('(?:^|; )' + encodeURIComponent(key) + '=([^;]*)'));
-        if (m) _memCache[key] = decodeURIComponent(m[1]);
-      } catch(e) {}
-    }
-  }
-}
+No dossiê final, strengths (pontos fortes) são frases curtas de até 8 palavras — SEM qualificadores. Lista PROIBIDA: "com precisão técnica", "baseado em evidência", "de forma articulada", "sistematicamente", "com passagem estruturada". Formato correto: "Reflexão complexa no turno 2", "Reframe da queixa por dieta", "Encaminhamento oportuno à equipe".`;
 
-// ===================== THEME =====================
-function toggleTheme() {
-  const d = document.documentElement;
-  const dark = d.getAttribute('data-theme') === 'dark';
-  d.setAttribute('data-theme', dark ? 'light' : 'dark');
-  document.querySelector('.theme-toggle').textContent = dark ? '🌙' : '☀️';
-  storageSet('foliculo_theme', dark ? 'light' : 'dark');
-}
-(function initTheme() {
-  const t = storageGet('foliculo_theme');
-  if (t === 'dark') {
-    document.documentElement.setAttribute('data-theme','dark');
-    document.querySelector('.theme-toggle').textContent = '☀️';
-  }
-})();
 
-// ===================== NAVIGATION =====================
-function showScreen(id) {
-  try {
-    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-    const target = document.getElementById(id);
-    if (!target) return;
-    target.classList.add('active');
-    STATE.screen = id;
-  } catch(e) {
-    console.error('showScreen error:', e);
-  }
-}
+// ============================================================================
+// ARQUÉTIPOS — 7 perfis de paciente com cobertura ampla do M01
+// ============================================================================
 
-function selectDifficulty(level) {
-  STATE.level = level;
-  showScreen('namescreen');
-  document.getElementById('playerName').focus();
-}
+const ARCHETYPES_TEXT = `
 
-// ===================== DAILY BLOCK =====================
-const DAILY_KEY = 'foliculo_daily';
+# ARQUÉTIPOS DISPONÍVEIS
 
-function checkDailyBlock() {
-  const today = new Date().toISOString().split('T')[0];
-  // Check lightweight daily key
-  const dailyVal = storageGet(DAILY_KEY);
-  if (dailyVal === today) {
-    showScreen('dailyblock');
-    updateBlockTimer();
-    return true;
-  }
-  // Also check main state
-  const data = storageGet(STORAGE_KEY);
-  if (!data) return false;
-  try {
-    const saved = JSON.parse(data);
-    if (saved.completedDate) {
-      const completed = new Date(saved.completedDate);
-      const now = new Date();
-      if (completed.toDateString() === now.toDateString()) {
-        showScreen('dailyblock');
-        updateBlockTimer();
-        return true;
-      }
-    }
-  } catch(e) {}
-  return false;
-}
+A seleção do arquétipo é feita por seed antes de você começar. Use APENAS o arquétipo selecionado.
 
-function updateBlockTimer() {
-  const now = new Date();
-  const tomorrow = new Date(now); tomorrow.setDate(tomorrow.getDate()+1); tomorrow.setHours(0,0,0,0);
-  const diff = tomorrow - now;
-  const h = Math.floor(diff/3600000); const m = Math.floor((diff%3600000)/60000);
-  const el = document.getElementById('blockTimer');
-  if (el) el.textContent = `Próxima sessão disponível em ${h}h ${m}min.`;
-}
+## Arquétipo 1 — maria-dieteira-cronica (Júnior/Pleno)
+**Identidade:** Maria Helena, 42 anos, professora do ensino fundamental, casada, dois filhos adolescentes. IMC 32.
+**Queixa declarada:** "Eu preciso emagrecer. Já fiz de tudo — Dukan, low carb, jejum, shake — perco 8 kg, recupero 10. Vim aqui pra você me dar UM plano que funcione dessa vez."
+**Dor real:** Está exausta emocionalmente do ciclo. Vergonha do próprio corpo (o irmão a chamou de "gordinha" numa festa de família semana passada). Recita valor calórico de dezenas de alimentos. Se autoproíbe pão, arroz, doce durante a semana e "desanda" nos fins de semana com culpa terrível. Ciclo dieta-restrição-compulsão-recuperação clássico (T01).
+**Perfil comportamental predominante:** Comer restrito com desinibição episódica (DEBQ: alta restrição, moderada emocional). TFEQ-R18 mostraria alta restrição cognitiva e alta desinibição.
+**Estágio de mudança:** Contemplação recuada — quer mudar mas descrente. Se o nutricionista propuser mais uma dieta, ela topa (ela veio pedindo isso) — mas o ciclo se repete.
+**Sinais que emite:**
+- Cita nomes de dietas, calorias, "meta de peso"
+- Fala de "alimento proibido" e "descontrole"
+- Culpa forte após episódios
+- Fit alto para reframe da mentalidade de dieta — se o nutricionista fizer isso bem, ela chora de alívio
+**Conduta esperada do nutricionista:**
+- NÃO entregar dieta. Segurar o reflexo de correção.
+- Reflexão complexa sobre o esgotamento do ciclo (T01: Herman & Mack, Mann et al.)
+- Mapear ciclo restrição-descontrole com perguntas abertas (OARS — T05)
+- Escolher DEBQ ou TFEQ-R18 (T04) — explicando por que
+- Reframe da queixa: "Antes de a gente falar em o que comer, quero entender o que sustenta essa dificuldade tantas vezes."
+- Introduzir noção de comer intuitivo/mindful eating como caminho (T03), sem prometer emagrecimento
+- Próximo passo: retorno com DEBQ preenchido + registro do padrão emocional em situações concretas
+**Conceitos esperados:** ciclo-dieta-recuperacao, nao-prescricao, reflexo-correcao, debq, oars, comer-intuitivo, evidencia-honesta
+**Traps:**
+- Nutricionista que entrega dieta porque "a paciente pediu" → HARD FAIL (moraliza + prescreve rígido)
+- Nutricionista que promete perda de X kg → HARD FAIL
+- Nutricionista que fala "você precisa cortar o pão" → moraliza (escopo cai)
+- Nutricionista que só faz recordatório sem escuta comportamental → escuta baixa
 
-// ===================== SESSION PERSISTENCE =====================
-function saveSession() {
-  storageSet(STORAGE_KEY, JSON.stringify({
-    ...STATE,
-    savedAt: new Date().toISOString()
-  }));
-}
+## Arquétipo 2 — carlos-comedor-emocional (Júnior/Pleno)
+**Identidade:** Carlos Eduardo, 35 anos, gerente comercial em multinacional, solteiro. IMC 28.
+**Queixa declarada:** "Doutor(a), eu quero emagrecer 8 kg. Meu médico pediu — colesterol subiu. Mas eu não consigo. Fim do dia eu chego em casa e é ver a geladeira que eu abro."
+**Dor real:** Rotina de reuniões estressantes de manhã à noite. Chega em casa exausto às 22h. Não tem fome — tem "vontade de pausa". Come sanduíche de queijo, biscoito recheado, mistura de coisas. Sente alívio momentâneo, depois sente ruim. Isso vem escalando desde a promoção há 8 meses.
+**Perfil comportamental predominante:** Comer emocional puro (DEBQ: alta emocional, baixa restritiva, baixa externa). Não faz dieta. Sabe teoricamente o que fazer.
+**Estágio de mudança:** Contemplação avançada / preparação — reconhece o problema, quer mudar, precisa de ajuda para nomear a função do comer.
+**Sinais que emite:**
+- Fala do trabalho o tempo todo
+- Descreve "não ter fome" mas comer
+- Cita "força de vontade" como problema
+- Se o nutricionista perguntar sobre a função emocional, ele reflete e às vezes se emociona
+**Conduta esperada do nutricionista:**
+- Diferenciar fome fisiológica de fome emocional (T02) — não assumir, PERGUNTAR
+- Modelo de Macht (5 vias emocionais) sem jargão
+- OARS — evocar o significado do comer noturno ("o que esse momento te dá?")
+- Escolher DEBQ (T04) confirmando o padrão emocional. Se sinais fortes de compulsão, considerar BES.
+- Não prometer emagrecimento — foco em regulação emocional e alternativas ao comer emocional
+- Sinalizar que trabalho emocional profundo é território do psicólogo — parceria multiprofissional
+- Próximo passo: registro contextual das crises noturnas (não só o que comeu — o que sentiu antes e depois)
+**Conceitos esperados:** fome-fisiologica-vs-emocional, determinantes-multi, debq, oars, espirito-em, ambiente-obesogenico
+**Traps:**
+- Nutricionista que fala "você tem que ter mais disciplina" → HARD FAIL (culpabiliza)
+- Nutricionista que diagnostica depressão ou sugere antidepressivo → HARD FAIL (invade escopo)
+- Nutricionista que prescreve "5 refeições estruturadas" sem escuta → prescrição rígida, escopo cai
 
-function checkSession() {
-  const data = storageGet(STORAGE_KEY);
-  if (!data) return false;
-  try {
-    const saved = JSON.parse(data);
-    if (saved.completedDate) return false;
-    if (saved.turn > 0 && !saved.gameOver && saved.level) {
-      STATE = { ...STATE, ...saved };
-      usedInvestigations = STATE.usedInvestigations || [];
-      showScreen('gamescreen');
-      renderGameState();
-      // Re-disable used investigation buttons
-      if (usedInvestigations.length > 0) {
-        setTimeout(() => markInvestigationUsed(), 100);
-      }
-      return true;
-    }
-  } catch(e) {}
-  return false;
-}
+## Arquétipo 3 — beatriz-comer-externo-noturno (Júnior)
+**Identidade:** Beatriz, 29 anos, analista de marketing digital em home office, mora sozinha. IMC 26.
+**Queixa declarada:** "Não sei se é caso pra nutricionista mesmo. Mas eu belisco o dia inteiro. Fica um pote de biscoito na mesa, na cadeira do lado, eu vou lá e como. Fim da tarde eu me pergunto: quanto será que eu já comi?"
+**Dor real:** Ambiente alimentar totalmente obesogênico — trabalha da mesa da cozinha, armário com biscoitos à mão, come vendo série da Netflix. Não tem restrição, não tem comer emocional forte. Tem comer externo puro — resposta a pistas (T02: reatividade a pistas / Boswell & Kober; framework socioecológico Story et al.).
+**Perfil comportamental predominante:** Comer externo (DEBQ: alta externa, baixa restritiva, baixa emocional).
+**Estágio de mudança:** Contemplação ativa — curiosa, aberta a intervir no ambiente.
+**Sinais que emite:**
+- Descreve o ambiente com riqueza
+- Não tem culpa forte
+- Se o nutricionista mapear o ambiente, ela se ilumina
+**Conduta esperada do nutricionista:**
+- Mapear ambiente com OARS (T05)
+- Reconhecer determinante ambiental (T02) — Story et al., ambiente obesogênico
+- Escolher DEBQ para confirmar padrão externo (T04)
+- Introduzir mindful eating (T03) como prática de atenção para o ambiente
+- Intervenções ambientais concretas: mudar local do biscoito, comer sem tela, sinalizar comer com atenção
+- Próximo passo: reorganização do ambiente + registro de comer com/sem atenção
+**Conceitos esperados:** ambiente-obesogenico, determinantes-multi, mindful-eating, debq, oars
+**Traps:**
+- Nutricionista que ignora ambiente e vai direto pro cardápio → não pontua determinante estrutural
+- Nutricionista que culpabiliza "você tem que ter força" → culpabiliza, hard fail
+- Nutricionista que só prescreve horários rígidos → não cabe no perfil, escopo cai
 
-function markDayComplete() {
-  // Set lightweight daily key
-  storageSet(DAILY_KEY, new Date().toISOString().split('T')[0]);
-  // Also update main state
-  const data = storageGet(STORAGE_KEY);
-  let saved = data ? JSON.parse(data) : {};
-  saved.completedDate = new Date().toISOString();
-  storageSet(STORAGE_KEY, JSON.stringify(saved));
-}
+## Arquétipo 4 — rita-sinal-transtorno-alimentar (Sênior) — CRÍTICO
+**Identidade:** Rita, 22 anos, estudante universitária de Educação Física. IMC 20 (normal). Bruna Rita — mora com os pais.
+**Queixa declarada:** "Eu quero emagrecer mais uns 3 kg pra ficar tudo certinho pro estágio de personal. Só isso."
+**Dor real:** SINAIS DE TRANSTORNO ALIMENTAR. Restrição severa durante a semana (consome ~800 kcal/dia — pula café, jantar só folha). Fins de semana: episódios compulsivos com culpa intensa, seguidos de exercício exagerado no dia seguinte (3h de cardio) como compensação. Checa peso 3-4x/dia. Pesa comida com balança de precisão. Escondeu isso da família. Chora depois de comer.
+**Perfil comportamental predominante:** Padrão indicativo de transtorno alimentar (Bulimia Nervosa ou transtorno da compulsão alimentar com comportamento compensatório). EAT-26 seria elevado (>20). BES elevado. Este arquétipo TESTA se o nutricionista RASTREIA RISCO e ENCAMINHA.
+**Estágio de mudança:** Pré-contemplação para o TA (não vê como problema) / preparação para a "dieta".
+**Sinais que emite (só se bem escutada):**
+- "Só como salada à noite mesmo" (pergunta o dia todo)
+- "Eu vomito de vez em quando quando exagero — mas é raro"
+- "Eu peso os alimentos, é normal, né?"
+- "Fim de semana às vezes eu como muito e daí segunda faço 3h de esteira"
+**Conduta esperada do nutricionista:**
+- Escuta com sensibilidade extra — não perguntar direto sobre TA (isso fecha)
+- OARS refinado — perguntas abertas específicas ("como é o fim de semana pra você?", "quando você fala de peso, quanto pesa hoje?")
+- Reconhecer sinais de alerta cedo — restrição severa + episódios + compensatório
+- Escolher rastreio adequado: EAT-26 (rastreio de TA) e/ou BES (compulsão). NÃO IES-2 aqui — o comer intuitivo NÃO é indicado como primeira linha em TA ativo (T03: cautela!)
+- ENCAMINHAR à equipe multiprofissional: psicólogo com formação em TA + psiquiatra + médico. NUTRICIONISTA COMPORTAMENTAL NÃO CONDUZ TA SOZINHO(A).
+- Sinalizar isso à paciente sem alarmá-la ("Eu percebo alguns padrões que gostaria de investigar melhor com uma equipe. Nossa jornada aqui continua, mas eu queria te pedir para conversarmos também com uma psicóloga e uma médica que trabalham junto comigo.")
+- Próximo passo: retorno agendado + agendamento com psicólogo(a) e médico(a) da equipe
+**Conceitos esperados:** rastreio-vs-diagnostico, oars, espirito-em, estagios-mudanca, evidencia-honesta
+**Traps:**
+- Nutricionista que oferece "dieta pra emagrecer 3 kg" sem rastrear → HARD FAIL (ignora sinal de TA)
+- Nutricionista que fala "você tem que comer mais" ou "você não pode fazer isso" → confronto, dispara reactância
+- Nutricionista que diagnostica bulimia → HARD FAIL (invade escopo — quem diagnostica é médico/psiquiatra)
+- Nutricionista que aplica IES-2 aqui → erro técnico (T03: comer intuitivo com cautela em TA ativo)
+- Nutricionista que não encaminha → escopo cai brutalmente
 
-// ===================== GAME INIT =====================
-function startGame() {
-  const name = document.getElementById('playerName').value.trim();
-  if (!name) { document.getElementById('playerName').focus(); return; }
-  STATE.playerName = name;
-  STATE.turn = 0;
-  STATE.phase = 0;
-  STATE.turnInPhase = 0;
-  STATE.indicators = { acuracia: 0, fundamentacao: 0, seguranca: 50, conduta: 0 };
-  STATE.history = [];
-  STATE.narrative = '';
-  STATE.consultantUsed = [];
-  STATE.usedInvestigations = [];
-  usedInvestigations = [];
-  STATE.gameOver = false;
-  STATE.hardFail = false;
-  STATE.seed = Math.floor(Math.random() * 999999);
+## Arquétipo 5 — jorge-pos-bariatrica-reganho (Sênior)
+**Identidade:** Jorge, 48 anos, empresário, 2 anos pós-bypass gástrico. Perdeu 40 kg no primeiro ano, ganhou 8 kg de volta nos últimos 6 meses. IMC atual 31.
+**Queixa declarada:** "Doutor(a), tô voltando a engordar. Sinto vergonha de ter feito cirurgia e estar aqui de novo. Me manda pra qualquer coisa que resolva rápido."
+**Dor real:** Contexto MISTO. Precisa de acompanhamento clínico-nutricional específico da bariátrica (suplementação, proteína, restrição gástrica atual) — isso É pertinente à prescrição comportamental. MAS também caiu na crença de "falhei" e está oscilando entre restrição severa e episódios de doçarias líquidas (que passam pela pouch). Comer emocional escalado desde separação recente da esposa.
+**Perfil comportamental predominante:** Comer emocional + restrição punitiva combinada + necessidade clínica real de acompanhamento pós-bariátrico.
+**Estágio de mudança:** Contemplação com autoflagelação — precisa de acolhimento antes de intervenção.
+**Sinais que emite:**
+- Autoculpa forte ("eu falhei", "eu não mereço ter feito a cirurgia")
+- Menção à separação
+- Sabe muito sobre bariátrica tecnicamente
+- Se o nutricionista tratar o comer emocional com escuta, ele se abre
+**Conduta esperada do nutricionista:**
+- ACOLHER a vergonha antes de qualquer conduta — reflexão complexa
+- Distinguir: acompanhamento clínico pós-bariátrico (proteína, suplementos, avaliação gástrica) É pertinente e não é "dieta rígida" no sentido moralizante. Mas o comer emocional NÃO se resolve com mais dieta.
+- Escolher DEBQ para mapear emocional, e considerar registro contextual das crises emocionais pós-separação
+- Sinalizar equipe: cirurgião bariátrico + psicólogo (recente evento de vida) + endocrinologista
+- Aliança terapêutica (T05) — este paciente vai desistir se sentir julgamento
+- Próximo passo: consulta com equipe multiprofissional, registro emocional, retorno em 2 semanas
+**Conceitos esperados:** biopsicossocial, fome-fisiologica-vs-emocional, debq, oars, espirito-em, estagios-mudanca
+**Traps:**
+- Nutricionista que "vamos voltar ao plano da cirurgia rigoroso" sem tocar no emocional → prescrição rígida, ignora determinante emocional
+- Nutricionista que reforça culpa ("realmente, você recuperou, precisa se esforçar") → culpabiliza, HARD FAIL
+- Nutricionista que ignora recém-separação → não tem escuta biopsicossocial
 
-  showScreen('gamescreen');
-  renderGameState();
-  requestFirstTurn();
-}
+## Arquétipo 6 — luiza-obesidade-e-comorbidade (Pleno/Sênior)
+**Identidade:** Luiza, 51 anos, secretária administrativa, casada. IMC 41 (obesidade grau 3). HAS e DM2 recém-diagnosticados. Chegou "porque o endócrino mandou".
+**Queixa declarada:** "Doutora, eu não queria estar aqui. Já fiz 20 nutricionistas na vida. Todas falaram a mesma coisa: 'coma frango grelhado, salada e água'. Eu perco 5 kg, depois volto a comer o que gosto e recupero. Não tenho força pra outro sofrimento."
+**Dor real:** Estigma acumulado por décadas — foi humilhada em consultórios ("gorda", "descuidada", "não tem vergonha"). Comer não é o problema principal — é a FONTE de conforto num casamento morno e num trabalho que a diminui. Comer intuitivo pode ajudar A LONGO PRAZO, mas HAS + DM2 exigem cuidado imediato com padrões alimentares específicos (índice glicêmico, sódio) — sem virar dieta rígida moralizante.
+**Perfil comportamental predominante:** Misto — emocional forte + externo moderado + restrição episódica falhada.
+**Estágio de mudança:** Pré-contemplação forte para dieta / contemplação para OUTRA relação com comida.
+**Sinais que emite:**
+- Cansaço, resignação, "já ouvi tudo isso"
+- Se o nutricionista abordar com estigma zero e escuta, ela se abre pouco a pouco
+- Testa: pergunta se ela pode comer feijoada
+- Fala do marido, do trabalho
+**Conduta esperada do nutricionista:**
+- Explicitar estigma zero na fala inicial — Tomiyama et al., Bacon & Aphramor (T01)
+- Não focar em peso — focar em relação com comida + saúde metabólica
+- Reconhecer história de dietas fracassadas — evidência (Mann et al.)
+- Escolher DEBQ ou TFEQ para mapear padrões atuais
+- Introduzir noção de comer intuitivo/mindful como caminho — mas com honestidade sobre limitação (T03: evidência para peso é fraca, para desfechos psicológicos é boa)
+- Combinar cuidado do HAS/DM2 com abordagem centrada na saúde (não no peso) — flexibilidade + orientação
+- Aliança forte antes de qualquer intervenção (T05)
+- Próximo passo: retorno com espaço para conversar, sem meta de peso, foco em bem-estar
+**Conceitos esperados:** estigma-de-peso, evidencia-honesta, nao-prescricao, biopsicossocial, debq, comer-intuitivo, espirito-em, aliance
+**Traps:**
+- Nutricionista que fala "mas você TEM que emagrecer, você tem DM" → moraliza, culpa, escopo cai
+- Nutricionista que promete "vamos perder 20 kg em 6 meses" → HARD FAIL (promessa)
+- Nutricionista que aplica só comer intuitivo sem tocar em HAS/DM2 → não integra saúde metabólica
 
-// ===================== RENDER =====================
-function renderGameState() {
-  const cfg = LEVEL_CONFIG[STATE.level];
-  document.getElementById('levelLabel').textContent = cfg.label;
-  document.getElementById('turnBadge').textContent = `Turno ${STATE.turn + 1}/${cfg.turns}`;
-  document.getElementById('phaseBadge').textContent = PHASE_NAMES[STATE.phase];
+## Arquétipo 7 — paulo-ortorexia-nascente (Sênior)
+**Identidade:** Paulo, 38 anos, engenheiro civil, corredor amador (maratonista). IMC 24. Casado, sem filhos.
+**Queixa declarada:** "Vim aqui pra você ajustar o meu plano. Eu já faço low carb estrito, jejum intermitente 16/8, calculo cada macro. Quero baixar de 12% pra 8% de gordura corporal pra ficar em forma na próxima maratona."
+**Dor real:** Ortorexia começando (relação disfuncional com "comer certo"). Recusou convite de aniversário porque o bolo "não estava no plano". Discute com esposa sobre o que comer. Ansiedade forte se sai da rotina alimentar. Passou madrugada em casa por não conseguir jantar fora sem "poluir" a dieta.
+**Perfil comportamental predominante:** Restrição cognitiva rígida com moralização forte da comida (isso se aproxima de ortorexia — que embora não seja diagnóstico do DSM-5, tem correlato clínico reconhecido).
+**Estágio de mudança:** Pré-contemplação — não reconhece problema.
+**Sinais que emite:**
+- Linguagem tecnicista ("macros", "período de cutting")
+- Menciona conflito social ("recusei convite") sem se conectar ao significado
+- Se o nutricionista validar a rigidez, ele fica feliz — mas o problema se aprofunda
+**Conduta esperada do nutricionista:**
+- NÃO validar a rigidez. Nomear (com cuidado) o custo — refletir a fala do próprio Paulo sobre recusar o aniversário
+- OARS refinado — perguntas evocativas ("o que essa rigidez está te custando em outras áreas?", "como estava sua esposa naquele momento?")
+- Diferenciar cuidado nutricional em performance esportiva (pertinente) de rigidez moralizante (problemática)
+- Considerar EAT-26 para rastrear ortorexia (embora escala específica ORTO-15/EHQ exista) e sinalizar equipe (psicólogo com formação em ortorexia + médico do esporte)
+- NÃO interpretar como transtorno — só sinalizar padrão e encaminhar avaliação
+- Próximo passo: retorno + avaliação em equipe
+**Conceitos esperados:** rastreio-vs-diagnostico, evidencia-honesta, oars, reflexo-correcao, biopsicossocial, espirito-em
+**Traps:**
+- Nutricionista que valida "ótimo, vamos ajustar os macros pra 8%" → não escuta a dor real
+- Nutricionista que fala "isso é ortorexia, você tem transtorno" → HARD FAIL (diagnostica)
+- Nutricionista que ignora recusa do aniversário como sinal → perde chance de reflexão evocativa
+`;
 
-  document.getElementById('phaseTitle').textContent = `${PHASE_ICONS[STATE.phase]} Fase de ${PHASE_NAMES[STATE.phase]}`;
-  document.getElementById('phaseDesc').textContent = PHASE_DESCS[STATE.phase];
 
-  // Indicators
-  const ids = ['acuracia','fundamentacao','seguranca','conduta'];
-  ids.forEach((id, i) => {
-    const val = Math.max(0, Math.min(100, STATE.indicators[id]));
-    document.getElementById(`ind${i+1}val`).textContent = val;
-    document.getElementById(`ind${i+1}bar`).style.width = val + '%';
-  });
+// ============================================================================
+// REFERENCE CONTENT — Playbook M01 embutido para a IA consultar
+// ============================================================================
 
-  // Toggles
-  document.getElementById('investigationToggle').style.display = STATE.phase === 0 ? 'block' : 'none';
-  document.getElementById('frameworkToggle').style.display = STATE.phase === 1 ? 'block' : 'none';
+const REFERENCE_CONTENT = `
 
-  // Re-apply used investigation states
-  if (STATE.phase === 0 && usedInvestigations.length > 0) {
-    document.querySelectorAll('#investigationOptions .toggle-opt').forEach(btn => {
-      const val = btn.getAttribute('data-val');
-      if (usedInvestigations.includes(val)) {
-        btn.classList.add('used');
-        btn.classList.remove('selected');
-        btn.style.opacity = '0.4';
-        btn.style.textDecoration = 'line-through';
-        btn.style.cursor = 'not-allowed';
-      }
-    });
-  }
+# PLAYBOOK M01 NUTRIÇÃO COMPORTAMENTAL — REFERÊNCIA PARA AVALIAÇÃO
 
-  // Response label
-  const labels = ['Descreva sua investigação','Articule sua fundamentação biológica','Descreva sua conduta e justificativa'];
-  document.getElementById('responseLabel').textContent = labels[STATE.phase];
+Você usa este playbook como FONTE DA VERDADE para avaliar o nutricionista. Tudo o que ele diz é checado contra isto.
 
-  // Narrative
-  if (STATE.narrative) {
-    document.getElementById('narrativeBox').textContent = STATE.narrative;
-  }
+## POSICIONAMENTO DO CAMPO (T01)
 
-  updateSubmitState();
-}
+Nutrição comportamental é abordagem que integra fisiológico, emocional, social e cultural do comer. Foca em COMO, POR QUE, QUANDO e EM QUE CIRCUNSTÂNCIAS a pessoa come — não só no O QUÊ. Rejeita moralização de alimentos. Reconhece falência do modelo prescritivo (Mann et al., 2007) e dano do estigma de peso (Tomiyama et al., 2018; Bacon & Aphramor, 2011).
 
-function updateCharCount() {
-  const text = document.getElementById('responseText').value.trim();
-  const words = text ? text.split(/\s+/).length : 0;
-  const counter = document.getElementById('charCounter');
-  counter.textContent = `${words} palavra${words !== 1 ? 's' : ''}`;
-  counter.classList.remove('warning');
-  updateSubmitState();
-}
+Não é anti-nutrição. É a aplicação do modelo biopsicossocial (Engel, 1977) ao cuidado nutricional.
 
-function updateSubmitState() {
-  const text = document.getElementById('responseText').value.trim();
-  document.getElementById('submitBtn').disabled = text.length < 1;
-}
+## DETERMINANTES DO COMER (T02)
 
-// ===================== TOGGLES =====================
-let selectedToggles = { investigation: [], framework: [] };
-let usedInvestigations = []; // tracks which investigations have been used in prior turns
+- **Fisiológicos:** leptina, grelina, cascata de saciedade, sistema homeostático × hedônico, reatividade a pistas (Boswell & Kober, 2016)
+- **Emocionais:** modelo psicossomático, 5 vias de Macht (2008), comer emocional
+- **Ambientais:** framework socioecológico (Story et al., 2008), ambiente obesogênico, ANGELO
 
-function selectInvestigation(btn) {
-  if (btn.classList.contains('used')) return; // already used in prior turn
-  const val = btn.getAttribute('data-val');
-  // Deselect all others (single-select)
-  document.querySelectorAll('#investigationOptions .toggle-opt').forEach(b => {
-    if (b !== btn) b.classList.remove('selected');
-  });
-  btn.classList.toggle('selected');
-  selectedToggles.investigation = btn.classList.contains('selected') ? [val] : [];
-}
+**Fome fisiológica vs. emocional (competência-chave):**
+| Aspecto | Fisiológica | Emocional |
+|---|---|---|
+| Instalação | Gradual | Súbita |
+| Localização | Corpo (estômago, energia) | "Cabeça", urgência difusa |
+| Especificidade | Aceita vários alimentos | Alimento específico |
+| Saciação | Cessa com plenitude | Persiste após plenitude |
+| Desfecho | Satisfação | Culpa |
+| Gatilho | Tempo desde última refeição | Evento emocional / pista |
 
-function toggleSelect(btn, group) {
-  btn.classList.toggle('selected');
-  const val = btn.getAttribute('data-val');
-  if (btn.classList.contains('selected')) {
-    selectedToggles[group].push(val);
-  } else {
-    selectedToggles[group] = selectedToggles[group].filter(v => v !== val);
-  }
-}
+## COMER INTUITIVO E MINDFUL EATING (T03)
 
-function clearToggles() {
-  document.querySelectorAll('.toggle-opt:not(.used)').forEach(b => b.classList.remove('selected'));
-  selectedToggles = { investigation: [], framework: [] };
-}
+**Comer intuitivo (Tribole & Resch):** 10 princípios. IES-2 mede 4 dimensões: permissão incondicional, comer por razões físicas não emocionais, confiança em sinais internos, congruência corpo-alimento.
 
-function markInvestigationUsed() {
-  if (selectedToggles.investigation.length > 0) {
-    const val = selectedToggles.investigation[0];
-    if (!usedInvestigations.includes(val)) usedInvestigations.push(val);
-    STATE.usedInvestigations = [...usedInvestigations];
-  }
-  // Disable used buttons visually
-  document.querySelectorAll('#investigationOptions .toggle-opt').forEach(btn => {
-    const val = btn.getAttribute('data-val');
-    if (usedInvestigations.includes(val)) {
-      btn.classList.add('used');
-      btn.classList.remove('selected');
-      btn.style.opacity = '0.4';
-      btn.style.textDecoration = 'line-through';
-      btn.style.cursor = 'not-allowed';
-    }
-  });
-}
+**Mindful eating (MB-EAT):** atenção plena aplicada ao comer. Programa Kristeller & Wolever para compulsão alimentar.
 
-// ===================== API CALL =====================
-async function callAPI(messages) {
-  const res = await fetch(API_URL, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      model: MODEL,
-      max_tokens: 1500,
-      system: buildSystemPrompt(),
-      messages: messages
-    })
-  });
-  if (!res.ok) throw new Error(`API ${res.status}: ${res.statusText}`);
-  const data = await res.json();
-  const text = data.content.find(c => c.type === 'text')?.text;
-  if (!text) throw new Error('Resposta vazia da API');
-  return parseJSON(text);
-}
+**Distinção:** comer intuitivo = estilo alimentar amplo; mindful eating = prática atencional.
 
-function parseJSON(text) {
-  // Strategy 1: direct
-  try { return JSON.parse(text); } catch(e) {}
-  // Strategy 2: extract from markdown
-  const md = text.match(/```(?:json)?\s*([\s\S]*?)```/);
-  if (md) { try { return JSON.parse(md[1].trim()); } catch(e) {} }
-  // Strategy 3: find { ... }
-  const brace = text.match(/\{[\s\S]*\}/);
-  if (brace) { try { return JSON.parse(brace[0]); } catch(e) {} }
-  // Strategy 4: clean
-  if (brace) {
-    let c = brace[0].replace(/,\s*([}\]])/g,'$1').replace(/'/g,'"').replace(/[\x00-\x1F\x7F]/g,' ');
-    try { return JSON.parse(c); } catch(e) {}
-  }
-  // Strategy 5: key extraction
-  try {
-    const obj = {};
-    const re = /"(\w+)"\s*:\s*("(?:[^"\\]|\\.)*"|\[[\s\S]*?\]|\{[\s\S]*?\}|-?\d+\.?\d*|true|false|null)/g;
-    let m;
-    while ((m = re.exec(text)) !== null) {
-      try { obj[m[1]] = JSON.parse(m[2]); } catch(e) { obj[m[1]] = m[2].replace(/^"|"$/g,''); }
-    }
-    if (Object.keys(obj).length > 0) return obj;
-  } catch(e) {}
-  console.warn('JSON parse failed:', text.substring(0,200));
-  return null;
-}
+**Evidência (leitura honesta):**
+- Correlatos psicológicos: robusta (Linardon et al., 2021 — metaanálise). Mas 90% transversal — não estabelece causalidade.
+- Peso: fraca e inconsistente. NÃO é método de emagrecimento.
+- Desfechos psicológicos e compulsão: força maior.
 
-function showLoading(text) {
-  document.getElementById('loadingText').textContent = text || 'Analisando sua resposta...';
-  document.getElementById('loadingOverlay').classList.add('active');
-}
-function hideLoading() {
-  document.getElementById('loadingOverlay').classList.remove('active');
-}
-function showError(msg) {
-  document.getElementById('errorMsg').textContent = msg;
-  document.getElementById('errorBox').classList.add('active');
-}
-function hideError() {
-  document.getElementById('errorBox').classList.remove('active');
-}
+**Cautelas:** insegurança alimentar, TA ATIVO (comer intuitivo pode ser prematuro em TA — cautela clínica).
 
-// ===================== GAME FLOW =====================
-let lastAction = null;
+## INSTRUMENTOS DE AVALIAÇÃO (T04)
 
-async function requestFirstTurn() {
-  showLoading('Preparando caso clínico...');
-  hideError();
+| Instrumento | Mede | Perfil típico |
+|---|---|---|
+| **DEBQ** (van Strien) | Restrição / Emoção / Externo | Triagem inicial multidimensional |
+| **TFEQ / TFEQ-R18/R21** (Stunkard & Messick; Karlsson) | Restrição cognitiva / Desinibição / Fome | Restrição + desinibição |
+| **EAT-26** (Garner) | Rastreio de risco de TA | Suspeita de anorexia/bulimia |
+| **BES / ECAP** (Gormally; Freitas) | Compulsão alimentar | Episódios compulsivos |
+| **IES-2** (Tylka) | Comer intuitivo (4 dim.) | Monitoramento de progresso; NÃO em TA ativo |
+| **MEQ** (Framson) | Mindful eating | Avaliar prática atencional |
 
-  const messages = [
-    { role: 'user', content: `[SISTEMA: Início. Nível=${LEVEL_CONFIG[STATE.level].label}. Seed=${STATE.seed}. Turno 1/${LEVEL_CONFIG[STATE.level].turns}. Fase=Observação. Nome do profissional: ${STATE.playerName}.] Apresente o paciente entrando na sala.` }
-  ];
+**Regras críticas:**
+- Rastreio (EAT-26, BES) ≠ diagnóstico. Diagnóstico de TA é MÉDICO/PSIQUIÁTRICO. Nutricionista rastreia e encaminha.
+- Pontos de corte dependem da população de validação — versão brasileira, adulto, sexo.
+- Autorrelato tem viés de desejabilidade social.
+- Interpretação por perfil, não por escore único.
 
-  lastAction = async () => {
-    const result = await callAPI(messages);
-    if (!result) throw new Error('Não foi possível interpretar a resposta.');
-    STATE.history.push({ role: 'user', content: messages[0].content });
-    STATE.history.push({ role: 'assistant', content: JSON.stringify(result) });
-    applyResult(result);
+## CONSULTA COMPORTAMENTAL (T05)
+
+**Espírito da EM (Miller & Rollnick):** Parceria, Aceitação, Compaixão, Evocação.
+
+**OARS:**
+- **O**pen questions (perguntas abertas) — "O que te trouxe aqui?" não "Você quer emagrecer?"
+- **A**ffirmations — reconhecer forças concretas
+- **R**eflective listening — reflexão simples (parafrasear) e complexa (arriscar significado subjacente). Entonação DESCENDENTE.
+- **S**ummaries — sínteses periódicas
+
+**Aliança terapêutica (Bordin):** vínculo afetivo + acordo sobre objetivos + acordo sobre tarefas. Preditor consistente de desfecho (Flückiger et al., 2018).
+
+**Reflexo de correção (righting reflex):** impulso de "consertar" — dispara reactância. RECONHECER e SEGURAR.
+
+**Estágios de mudança (Prochaska & DiClemente):**
+- Pré-contemplação: nem cogita mudar. Não empurre plano — escute.
+- Contemplação: ambivalência viva. Evoque prós e contras.
+- Preparação: pronta para agir. Ajude a planejar.
+- Ação: modificando comportamento. Sustente.
+- Manutenção: prevenir recaída.
+- Recaída: ESPERADA, não fracasso.
+
+**Estrutura das fases:** Engajar (aliança) → Focar (agenda) → Evocar (discurso de mudança) → Planejar (metas pactuadas).
+
+**Sequência para dar informação sem reactância:** Evocar-Oferecer-Evocar ("o que você já sabe?" → informação neutra com permissão → "o que faz sentido pra você?").
+
+## O QUE NÃO FAZER — HARD FAIL
+
+1. Moralizar alimento ("proibido", "lixo", "do mal") ou corpo
+2. Culpabilizar ("falta de força de vontade", "descomprometido")
+3. Prescrever dieta restritiva rígida como resposta comportamental
+4. Ignorar sinal de TA sem encaminhamento à equipe
+5. Invadir escopo psicológico (diagnosticar TA, sugerir psicofármaco, interpretar trauma)
+6. Prometer perda de peso garantida em prazo (weight-neutral!)
+7. Enviar mensagem ofensiva ao paciente
+
+## ENCAMINHAMENTOS FUNDAMENTAIS
+
+- **Sinal de TA:** psicólogo(a) com formação em TA + psiquiatra + médico(a). Nunca sozinho.
+- **Comer emocional profundo com sofrimento:** psicólogo(a).
+- **Bariátrica:** cirurgião + endócrino + psicólogo(a) + nutricionista comportamental (rede).
+- **Evento de vida recente (luto, separação):** psicólogo(a).
+- **HAS/DM2 combinados:** integrar com médico(a) — não abrir mão de cuidado comportamental.
+
+## POSTURA — RESUMO
+
+A escuta é a tecnologia. A prescrição é ferramenta situacional. O paciente é especialista em si; você é especialista em comportamento alimentar e mudança. A dança é lado a lado, não de cima pra baixo.
+`;
+
+
+// Função que monta o system prompt completo com base no arquétipo selecionado
+function buildSystemPrompt() {
+  const seed = appState.seed;
+  const level = appState.level;
+
+  const archetypesByLevel = {
+    junior: [1, 2, 3],
+    pleno:  [1, 2, 5, 6],
+    senior: [4, 5, 6, 7]
   };
 
-  try {
-    await lastAction();
-  } catch(e) {
-    console.error(e);
-    showError(e.message || 'Erro ao conectar com o servidor.');
-  } finally {
-    hideLoading();
+  const pool = archetypesByLevel[level] || [1, 2, 3];
+  if (!appState.archetypeId) {
+    appState.archetypeId = pool[seed % pool.length];
   }
-}
+  const archetypeId = appState.archetypeId;
 
-async function submitResponse() {
-  const text = document.getElementById('responseText').value.trim();
-  if (!text) return;
-
-  hideError();
-  const cfg = LEVEL_CONFIG[STATE.level];
-  const nextTurn = STATE.turn + 1;
-
-  // Determine next phase
-  let nextPhase = STATE.phase;
-  let nextTurnInPhase = STATE.turnInPhase + 1;
-  const phaseLimit = cfg.phases[STATE.phase];
-  if (nextTurnInPhase >= phaseLimit && nextPhase < 2) {
-    nextPhase++;
-    nextTurnInPhase = 0;
-  }
-
-  const isLast = nextTurn >= cfg.turns;
-
-  // Build user message — metadata in brackets, then the professional's action in natural language
-  let userMsg = `[SISTEMA: Turno ${nextTurn}/${cfg.turns}. Fase=${PHASE_NAMES[STATE.phase]}.`;
-  if (STATE.phase === 0 && selectedToggles.investigation.length > 0) {
-    userMsg += ` Investigação=${selectedToggles.investigation.join(', ')}.`;
-  }
-  if (STATE.phase === 1 && selectedToggles.framework.length > 0) {
-    userMsg += ` Referência=${selectedToggles.framework.join(', ')}.`;
-  }
-  if (isLast) userMsg += ' ÚLTIMO TURNO — inclua diagnóstico_final e game_over:true.';
-  userMsg += `]\n\n${text}`;
-
-  // Build full message history
-  const messages = [...STATE.history, { role: 'user', content: userMsg }];
-
-  showLoading(STATE.phase === 0 ? 'Examinando o paciente...' : STATE.phase === 1 ? 'Avaliando sua fundamentação...' : 'Analisando sua conduta...');
-
-  lastAction = async () => {
-    const result = await callAPI(messages);
-    if (!result) throw new Error('Não foi possível interpretar a resposta.');
-    STATE.history.push({ role: 'user', content: userMsg });
-    STATE.history.push({ role: 'assistant', content: JSON.stringify(result) });
-    STATE.turn = nextTurn;
-    STATE.phase = nextPhase;
-    STATE.turnInPhase = nextTurnInPhase;
-    applyResult(result);
-    document.getElementById('responseText').value = '';
-    if (STATE.phase === 0 || nextPhase === 0) markInvestigationUsed(); // mark before clearing
-    clearToggles();
-    updateCharCount();
+  const archetypeNames = {
+    1: 'maria-dieteira-cronica',
+    2: 'carlos-comedor-emocional',
+    3: 'beatriz-comer-externo-noturno',
+    4: 'rita-sinal-transtorno-alimentar',
+    5: 'jorge-pos-bariatrica-reganho',
+    6: 'luiza-obesidade-e-comorbidade',
+    7: 'paulo-ortorexia-nascente'
   };
 
+  // FIXED: estável — cacheado pela API
+  const fixed = SYSTEM_PROMPT_BASE
+    + ARCHETYPES_TEXT
+    + REFERENCE_CONTENT;
+
+  // DYNAMIC: varia por sessão
+  const dynamic = '\n\n# ARQUÉTIPO SELECIONADO PARA ESTA SESSÃO\n\n'
+    + 'Arquétipo #' + archetypeId + ' (' + archetypeNames[archetypeId] + '). '
+    + 'Use APENAS as informações deste arquétipo. NÃO mencione outros arquétipos na conversa.\n\n'
+    + 'Nível da sessão: ' + level + ' (' + SIMULATOR_CONFIG.levels[level].turns + ' turnos de resposta do nutricionista).\n\n'
+    + 'Seed: ' + seed + ' (use para variações sutis dentro do arquétipo — sobrenome, empresa, mas mantendo a estrutura).';
+
+  return { fixed: fixed, dynamic: dynamic };
+}
+
+
+// ============================================================================
+// A CONSULTA — FLOW DAS TELAS ESTRUTURAIS
+// ============================================================================
+
+const SCHEMA_VERSION = 'v1.4.0-init';
+const SIM_ID = 'saunut-m01-consulta-comportamental';
+
+const appState = {
+  schemaVersion: SCHEMA_VERSION,
+  level: null,
+  studentName: '',
+  userName: null,
+  turn: 0,
+  indicators: {},
+  history: [],
+  turnLog: [],
+  consultantsUsed: 0,
+  seed: 0,
+  archetypeId: null,
+  sessionStartedAt: null,
+  ended: false,
+  hardFailed: false,
+  sessionId: '',
+  diagnosis: null,
+  earlyTermination: null
+};
+window.appState = appState;
+
+// Guard 1 (Lição 52): flag anti-reentrância em advanceTurn.
+// Escopo de módulo — NÃO faz parte do appState (não persiste).
+let _advanceTurnInFlight = false;
+
+function generateSessionId() {
+  const rand = Math.floor(Math.random() * 9000 + 1000);
+  return 'CNS-' + rand;
+}
+
+function onCoreReady() {
+  console.log('[A Consulta] === VERSAO: v1.4.0-init === (SAUNUT M01)');
+
+  // Badge de versão visível
   try {
-    await lastAction();
-  } catch(e) {
-    console.error(e);
-    showError(e.message || 'Erro ao conectar com o servidor.');
-  } finally {
-    hideLoading();
-  }
-}
+    const badge = document.createElement('div');
+    badge.style.cssText = 'position:fixed;bottom:6px;right:6px;background:#0074C7;color:#fff;font-family:Montserrat,system-ui;font-size:10px;padding:3px 8px;border-radius:3px;z-index:99999;opacity:0.55;pointer-events:none;';
+    badge.textContent = 'A Consulta v1.4.0-init';
+    document.body.appendChild(badge);
+  } catch(e) {}
 
-async function retryLastAction() {
-  if (!lastAction) return;
-  hideError();
-  showLoading('Tentando novamente...');
-  try {
-    await lastAction();
-  } catch(e) {
-    showError(e.message || 'Erro persistente.');
-  } finally {
-    hideLoading();
-  }
-}
-
-function applyResult(result) {
-  if (result.narrativa) STATE.narrative = result.narrativa;
-  if (result.indicadores) {
-    STATE.indicators.acuracia = clamp(result.indicadores.acuracia ?? STATE.indicators.acuracia, 0, 100);
-    STATE.indicators.fundamentacao = clamp(result.indicadores.fundamentacao ?? STATE.indicators.fundamentacao, 0, 100);
-    STATE.indicators.seguranca = clamp(result.indicadores.seguranca ?? STATE.indicators.seguranca, 0, 100);
-    STATE.indicators.conduta = clamp(result.indicadores.conduta ?? STATE.indicators.conduta, 0, 100);
-  }
-
-  // Check hard fail — average below 25% of max possible after turn 2+
-  if (STATE.turn >= 2) {
-    const pts = { junior: 25, pleno: 17, senior: 11 }[STATE.level];
-    const turnsPlayed = STATE.turn;
-    const maxPerIndicator = pts * turnsPlayed;
-    const maxSeguranca = 50 + maxPerIndicator;
-    const maxTotal = maxPerIndicator * 3 + maxSeguranca; // 3 indicators + segurança
-    const currentTotal = STATE.indicators.acuracia + STATE.indicators.fundamentacao + STATE.indicators.conduta + STATE.indicators.seguranca;
-    
-    if (currentTotal < Math.round(maxTotal * 0.25)) {
-      STATE.hardFail = true;
-      STATE.gameOver = true;
-    }
-  }
-  if (result.game_over) STATE.gameOver = true;
-  if (result.hard_fail) STATE.hardFail = true;
-
-  saveSession();
-
-  if (STATE.gameOver) {
-    endGame(result);
-  } else {
-    renderGameState();
-  }
-}
-
-function clamp(v, min, max) { return Math.max(min, Math.min(max, v)); }
-
-// ===================== GAME OVER =====================
-function endGame(result) {
-  markDayComplete();
-
-  const avg = Math.round((STATE.indicators.acuracia + STATE.indicators.fundamentacao + STATE.indicators.seguranca + STATE.indicators.conduta) / 4);
-
-  let icon = '📊', verdict = '';
-  if (STATE.hardFail) {
-    icon = '⚠️'; verdict = 'Erro crítico — desempenho abaixo do patamar mínimo aceitável.';
-  } else if (avg >= 80) {
-    icon = '🏆'; verdict = 'Desempenho excelente — fundamentação sólida e conduta segura.';
-  } else if (avg >= 60) {
-    icon = '✅'; verdict = 'Desempenho satisfatório — há pontos a aprimorar.';
-  } else {
-    icon = '📚'; verdict = 'Desempenho insuficiente — revise os fundamentos.';
-  }
-
-  document.getElementById('goIcon').textContent = icon;
-  document.getElementById('goTitle').textContent = STATE.hardFail ? 'Simulação Interrompida' : 'Simulação Concluída';
-  document.getElementById('goVerdict').textContent = verdict;
-
-  const names = ['Acurácia Observacional','Fundamentação Biológica','Segurança do Cliente','Conduta Profissional'];
-  const keys = ['acuracia','fundamentacao','seguranca','conduta'];
-  const colors = ['var(--indicator-1)','var(--indicator-2)','var(--indicator-3)','var(--indicator-4)'];
-  let indHTML = '';
-  keys.forEach((k,i) => {
-    indHTML += `<div class="final-ind"><div class="fi-label">${names[i]}</div><div class="fi-value" style="color:${colors[i]}">${STATE.indicators[k]}</div></div>`;
-  });
-  document.getElementById('finalIndicators').innerHTML = indHTML;
-
-  let narr = STATE.narrative || '';
-  if (result && result.diagnostico_final) narr += '\n\n📋 Diagnóstico final: ' + result.diagnostico_final;
-  if (result && result.modulos_revisar && result.modulos_revisar.length > 0) {
-    narr += '\n\n📚 Módulos para revisão: ' + result.modulos_revisar.join(', ');
-  }
-  document.getElementById('goNarrative').textContent = narr;
-
-  showScreen('gameover');
-}
-
-function resetGame() {
-  // Check if daily block applies — if so, show block screen instead of restarting
-  const today = new Date().toISOString().split('T')[0];
-  const dailyVal = storageGet(DAILY_KEY);
-  if (dailyVal === today) {
-    showScreen('dailyblock');
-    updateBlockTimer();
+  // 1. Daily block
+  if (ActiveIA.daily.isBlocked(SIM_ID)) {
+    showDailyBlock();
     return;
   }
-  storageRemove(STORAGE_KEY);
-  STATE = {
-    screen: 'tutorial1', level: null, playerName: '', turn: 0, phase: 0, turnInPhase: 0,
-    indicators: { acuracia: 0, fundamentacao: 0, seguranca: 50, conduta: 0 },
-    history: [], narrative: '', consultantUsed: [], usedInvestigations: [], gameOver: false, hardFail: false,
-    seed: Math.floor(Math.random() * 999999)
-  };
-  usedInvestigations = [];
-  showScreen('difficulty');
+
+  // 2. Sessão salva — schema versioning + sanity check (Guard 3, Lição 52)
+  const saved = ActiveIA.session.load(SIM_ID);
+  if (saved && saved.schemaVersion === SCHEMA_VERSION && !saved.ended && saved.turn > 0 && saved.level) {
+    const totalTurnsConfig = SIMULATOR_CONFIG.levels[saved.level].turns;
+    const maxAllowedTurn = totalTurnsConfig + 1;
+    const turnLogCount = (saved.turnLog || []).length;
+
+    if (saved.turn > maxAllowedTurn ||
+        (turnLogCount > 0 && Math.abs(saved.turn - turnLogCount) > 1)) {
+      console.error('[A Consulta] Estado corrompido em sessão salva. Descartando.');
+      ActiveIA.session.clear(SIM_ID);
+      ActiveIA.modal.show({
+        eyebrow: 'SESSÃO RECUPERADA',
+        title: 'Sua sessão anterior teve um problema técnico',
+        body: 'Por segurança, vamos começar uma nova sessão.',
+        actions: [{
+          label: 'Começar nova sessão',
+          primary: true,
+          onClick: function() { location.reload(); }
+        }]
+      });
+      return;
+    }
+
+    console.log('[A Consulta] Sessão salva encontrada — retomando.');
+    Object.assign(appState, saved);
+    resumeSession();
+    return;
+  }
+  if (saved) {
+    console.log('[A Consulta] Sessão antiga descartada (schema=' + (saved.schemaVersion || 'pre-v1.4') + '). Iniciando nova.');
+    ActiveIA.session.clear(SIM_ID);
+  }
+  appState.schemaVersion = SCHEMA_VERSION;
+
+  // 3. Registra callbacks globais
+  ActiveIA.on('reset-session', function() {
+    ActiveIA.modal.show({
+      eyebrow: 'RECOMEÇAR',
+      title: 'Recomeçar do zero?',
+      body: 'Sua sessão atual será perdida.',
+      actions: [
+        { label: 'Cancelar' },
+        {
+          label: 'Sim, recomeçar',
+          primary: true,
+          onClick: function() {
+            ActiveIA.session.clear(SIM_ID);
+            location.reload();
+          }
+        }
+      ]
+    });
+  });
+  ActiveIA.on('new-session', function() {
+    if (ActiveIA.daily.isBlocked(SIM_ID)) {
+      showDailyBlock();
+    } else {
+      ActiveIA.session.clear(SIM_ID);
+      location.reload();
+    }
+  });
+  ActiveIA.on('export-report', function() {
+    if (appState.diagnosis) exportReport(appState.diagnosis);
+  });
+  ActiveIA.on('share-linkedin', function() {
+    if (appState.diagnosis) exportLinkedInCard(appState.diagnosis);
+  });
+
+  showBoot();
 }
 
-// ===================== CONSULTANT =====================
-async function openConsultant(who) {
-  const c = CONSULTANTS[who];
-  document.getElementById('consultantName').textContent = c.icon + ' ' + c.name;
-  document.getElementById('consultantRole').textContent = c.role;
-  document.getElementById('consultantOpinion').textContent = 'Consultando...';
-  document.getElementById('consultantOverlay').classList.add('active');
+function showBoot() {
+  const mc = SIMULATOR_CONFIG.microcopy.boot;
+  ActiveIA.boot.render({
+    eyebrow: mc.eyebrow,
+    title: mc.title,
+    subtitle: mc.subtitle,
+    showResetBtn: false
+  });
+  setTimeout(showTutorial, 1800);
+}
 
-  STATE.consultantUsed.push(who);
+function showTutorial() {
+  const slides = SIMULATOR_CONFIG.microcopy.tutorial.slides;
+  ActiveIA.tutorial.render({
+    slides: slides,
+    onFinish: showNameScreen
+  });
+}
 
-  const prompt = who === 'renata'
-    ? `[SISTEMA: O profissional solicitou parecer da Dra. Renata. Fase atual: ${PHASE_NAMES[STATE.phase]}.] Responda como a Dra. Renata falaria diretamente ao profissional na clínica-escola. Parecer breve (máximo 150 palavras). Oriente o raciocínio sem entregar a resposta. Fale em segunda pessoa ("Você deveria observar...", "Sugiro que investigue..."). Responda APENAS o texto do parecer, sem JSON.`
-    : `[SISTEMA: O profissional solicitou parecer do Prof. Marcos. Fase atual: ${PHASE_NAMES[STATE.phase]}.] Responda como o Prof. Marcos falaria diretamente ao profissional na clínica-escola. Parecer breve (máximo 150 palavras) focando na biologia do folículo ou ciclo capilar. Oriente o raciocínio sem entregar a resposta. Fale em segunda pessoa ("Lembre-se de que a papila dérmica...", "Pense no ciclo capilar..."). Responda APENAS o texto do parecer, sem JSON.`;
+function showNameScreen() {
+  const mc = SIMULATOR_CONFIG.microcopy.namescreen;
+  ActiveIA.namescreen.render({
+    eyebrow: mc.eyebrow,
+    prompt: mc.prompt,
+    subtitle: mc.subtitle,
+    placeholder: mc.placeholder,
+    onConfirm: function(name) {
+      appState.studentName = name;
+      appState.userName = name;
+      showLevelScreen();
+    },
+    onBack: showTutorial
+  });
+}
 
-  const messages = [...STATE.history, { role: 'user', content: prompt }];
+function showLevelScreen() {
+  const mc = SIMULATOR_CONFIG.microcopy.levelscreen;
+  const lvls = SIMULATOR_CONFIG.levels;
+
+  ActiveIA.levelscreen.render({
+    eyebrow: mc.eyebrow,
+    title: mc.title,
+    subtitle: mc.subtitle,
+    cards: {
+      junior: {
+        num: '01',
+        label: 'JÚNIOR',
+        name: 'Paciente com perfil claro',
+        turns: lvls.junior.turns + ' cenas',
+        desc: lvls.junior.description
+      },
+      pleno: {
+        num: '02',
+        label: 'PLENO',
+        name: 'Paciente misto',
+        turns: lvls.pleno.turns + ' cenas',
+        desc: lvls.pleno.description
+      },
+      senior: {
+        num: '03',
+        label: 'SÊNIOR',
+        name: 'Paciente com sinais de risco',
+        turns: lvls.senior.turns + ' cenas',
+        desc: lvls.senior.description
+      }
+    },
+    onSelect: function(lvlId) {
+      startSession(lvlId);
+    }
+  });
+}
+
+function showDailyBlock() {
+  const mc = SIMULATOR_CONFIG.microcopy.dailyblock;
+  ActiveIA.dailyblock.render({
+    eyebrow: mc.eyebrow,
+    title: mc.title,
+    subtitle: mc.body
+  });
+}
+
+
+// ============================================================================
+// A CONSULTA — TURN ENGINE
+// ============================================================================
+
+function startSession(lvlId) {
+  appState.level = lvlId;
+  appState.turn = 0;
+  appState.indicators = {};
+  SIMULATOR_CONFIG.indicators.forEach(function(ind) {
+    appState.indicators[ind.id] = ind.initial;
+  });
+  appState.history = [];
+  appState.turnLog = [];
+  appState.consultantsUsed = 0;
+  appState.seed = Math.floor(Math.random() * 1000000);
+  appState.archetypeId = null;
+  appState.sessionStartedAt = new Date().toISOString();
+  appState.ended = false;
+  appState.hardFailed = false;
+  appState.sessionId = generateSessionId();
+  appState.diagnosis = null;
+  appState.schemaVersion = SCHEMA_VERSION;
+  appState.earlyTermination = null;
+
+  ActiveIA.session.save(SIM_ID, appState);
+  advanceTurn(null);
+}
+
+async function advanceTurn(userText) {
+  // Guard 1 (Lição 52): reentrância — anti-clique-duplo
+  if (_advanceTurnInFlight) {
+    console.warn('[A Consulta] advanceTurn já em andamento — ignorando chamada concorrente.');
+    return;
+  }
+
+  // Guard 2 (Lição 52): validação anti-vazamento de JSON da IA como userText
+  if (userText) {
+    const trimmed = userText.trim();
+    const looksLikeAIJSON = /^\s*[{\[]/.test(trimmed) &&
+      /"narrative"\s*:|"indicators"\s*:|"should_end"\s*:/.test(trimmed);
+    if (looksLikeAIJSON) {
+      console.error('[A Consulta] Entrada do nutricionista parece JSON da IA — BLOQUEADO.');
+      ActiveIA.modal.show({
+        eyebrow: 'ENTRADA INVÁLIDA',
+        title: 'Sua resposta não foi compreendida',
+        body: 'Algo estranho aconteceu com o formato da sua resposta. Por segurança, reiniciamos a sessão.',
+        actions: [{
+          label: 'Reiniciar sessão',
+          primary: true,
+          onClick: function() {
+            ActiveIA.session.clear(SIM_ID);
+            location.reload();
+          }
+        }]
+      });
+      return;
+    }
+  }
+
+  // Guard 3 (Lição 52): limite duro de appState.turn
+  const totalTurnsConfig = SIMULATOR_CONFIG.levels[appState.level] ? SIMULATOR_CONFIG.levels[appState.level].turns : 4;
+  const maxAllowedTurn = totalTurnsConfig + 1;
+  if (appState.turn >= maxAllowedTurn) {
+    console.error('[A Consulta] appState.turn (' + appState.turn + ') excedeu o máximo (' + maxAllowedTurn + '). Forçando encerramento.');
+    if (!appState.ended) {
+      appState.ended = true;
+      ActiveIA.session.save(SIM_ID, appState);
+      showEpilogueModal();
+    }
+    return;
+  }
+
+  _advanceTurnInFlight = true;
 
   try {
-    const res = await fetch(API_URL, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ model: MODEL, max_tokens: 500, system: buildSystemPrompt(), messages })
+    appState.turn += 1;
+
+    ActiveIA.loading.show('A paciente está pensando…');
+
+    if (userText) {
+      const totalTurns = SIMULATOR_CONFIG.levels[appState.level].turns;
+      const responseNum = appState.turn - 1;
+      const responsesRemaining = totalTurns - responseNum;
+
+      let turnMarker;
+      if (responseNum < totalTurns) {
+        turnMarker = '\n\n[META: Esta é a resposta ' + responseNum + ' de ' + totalTurns + ' do NUTRICIONISTA. Faltam ' + responsesRemaining + ' resposta(s). NÃO encerre agora — gere a próxima cena normalmente, deixe should_end: false. A cena de encerramento da consulta só vem após a resposta ' + totalTurns + '.]';
+      } else {
+        turnMarker = '\n\n[META: Esta é a RESPOSTA FINAL do NUTRICIONISTA (' + totalTurns + ' de ' + totalTurns + '). Esta é a cena de DESFECHO — a paciente aceitando o encaminhamento, agendando retorno, saindo em silêncio, o que for coerente com o arquétipo. Gere uma narrativa COMPLETA de fechamento. should_end: true.]';
+      }
+
+      appState.history.push({
+        role: 'user',
+        content: userText + turnMarker
+      });
+    }
+
+    const response = await requestAITurn();
+    handleAIResponse(response);
+  } catch (err) {
+    console.error('[A Consulta] Erro na chamada da IA:', err);
+    ActiveIA.loading.hide();
+    ActiveIA.modal.show({
+      eyebrow: 'ERRO',
+      title: 'Houve um erro na chamada',
+      body: 'Detalhes: ' + (err && err.message ? err.message : 'desconhecido') + '. Você pode tentar responder novamente.',
+      actions: [{ label: 'Ok', primary: true }]
     });
-    const data = await res.json();
-    const text = data.content.find(c => c.type === 'text')?.text || 'Parecer não disponível no momento.';
-    document.getElementById('consultantOpinion').textContent = text;
-  } catch(e) {
-    document.getElementById('consultantOpinion').textContent = 'Não foi possível obter o parecer. Tente novamente.';
+    appState.turn -= 1;
+  } finally {
+    _advanceTurnInFlight = false;
   }
 }
 
-function closeConsultant(e) {
-  if (e.target === document.getElementById('consultantOverlay')) {
-    document.getElementById('consultantOverlay').classList.remove('active');
+async function requestAITurn() {
+  const messages = appState.history.slice();
+  if (messages.length === 0) {
+    messages.push({
+      role: 'user',
+      content: '[Início da sessão. Apresente o paciente com sua fala de abertura da consulta. Este é o turno 1 — a abertura, antes de qualquer resposta do nutricionista.]'
+    });
+  }
+
+  const sp = buildSystemPrompt();
+  const response = await ActiveIA.callAPI({
+    systemFixed: sp.fixed,
+    systemDynamic: sp.dynamic,
+    messages: messages,
+    maxTokens: 2500,
+    config: SIMULATOR_CONFIG    // v1.4.0 — ativa guard preventivo de conduta
+  });
+
+  return response;
+}
+
+function handleAIResponse(response) {
+  const parsed = response.parsed;
+  if (!parsed) {
+    console.error('[A Consulta] Resposta da IA não parseada:', response);
+    ActiveIA.loading.hide();
+    ActiveIA.modal.show({
+      eyebrow: 'ERRO',
+      title: 'Não consegui interpretar a resposta',
+      body: 'Você pode tentar responder novamente.',
+      actions: [{ label: 'Ok', primary: true }]
+    });
+    appState.turn -= 1;
+    return;
+  }
+
+  // Atualiza indicadores (acumulativos)
+  if (parsed.indicators) {
+    Object.keys(parsed.indicators).forEach(function(key) {
+      appState.indicators[key] = parsed.indicators[key];
+    });
+  }
+
+  // Registra no turnLog
+  appState.turnLog.push({
+    turn: appState.turn,
+    userResponse: appState.history[appState.history.length - 1] ? appState.history[appState.history.length - 1].content : null,
+    assistantNarrative: parsed.narrative || '',
+    feedback: parsed.feedback || '',
+    articulation_class: parsed.articulation_class || 'parcial',
+    indicators_snapshot: Object.assign({}, appState.indicators),
+    case_state: parsed.case_state || {},
+    patient_pills: parsed.patient_pills || [],
+    phase: parsed.phase_next || 'engajar',
+    scene_eyebrow: parsed.scene_eyebrow || ('T' + appState.turn)
+  });
+
+  // Registra a fala da IA no histórico (JSON serializado — Guard 2 protege
+  // contra este JSON vazar como userText num próximo turno)
+  appState.history.push({
+    role: 'assistant',
+    content: JSON.stringify(parsed)
+  });
+
+  ActiveIA.session.save(SIM_ID, appState);
+  ActiveIA.loading.hide();
+
+  // ============================================================
+  // ENCERRAMENTO — ORDEM DETERMINÍSTICA (Lição 45)
+  // Regra 0 (risco ≤10) → Regra 1 (hard fail global) → turno final natural
+  // ============================================================
+  const totalTurns = SIMULATOR_CONFIG.levels[appState.level].turns;
+  const userResponseCount = appState.turn - 1;
+  const isLastTurn = userResponseCount >= totalTurns;
+  const isHardFail = parsed.should_end && parsed.hard_fail === true;
+
+  // Regra 0 — indicador de risco (escopo começa em 100, cai com decisões que erodem escopo)
+  const scopeValue = appState.indicators.escopo;
+  const isRiskCollapse = (typeof scopeValue === 'number' && scopeValue <= 10);
+
+  if (isHardFail || isRiskCollapse) {
+    appState.ended = true;
+    appState.hardFailed = true;
+    appState.earlyTermination = isHardFail
+      ? { reason: 'rule1', message: 'Hard fail — quebra de regra de integridade profissional.' }
+      : { reason: 'rule0', message: 'Encerramento por deterioração do escopo profissional (indicador de risco).' };
+    ActiveIA.session.save(SIM_ID, appState);
+    renderGamescreen(parsed);
+    setTimeout(showEpilogueModal, 800);
+  } else if (isLastTurn) {
+    appState.ended = true;
+    appState.hardFailed = false;
+    ActiveIA.session.save(SIM_ID, appState);
+    renderGamescreen(parsed);
+    // Cena final SEM modal automático — troca o botão para "Avançar para o dossiê"
+    setTimeout(function() {
+      const submitBtn = document.querySelector('[data-aia-action="submit-response"]');
+      if (submitBtn) {
+        submitBtn.textContent = 'Avançar para o dossiê →';
+        submitBtn.onclick = function() { showEpilogueModal(); };
+        submitBtn.disabled = false;
+      }
+      const textarea = document.getElementById('response-textarea');
+      if (textarea) {
+        textarea.style.display = 'none';
+      }
+      const hints = document.querySelectorAll('.hint-bar, .input-hint');
+      hints.forEach(function(h) { h.style.display = 'none'; });
+    }, 100);
+  } else {
+    // Ignora should_end da IA em turnos intermediários (Lição 45)
+    if (parsed.should_end === true) {
+      console.warn('[A Consulta] IA tentou encerrar prematuramente no turno ' + appState.turn + ' (resposta ' + userResponseCount + ' de ' + totalTurns + '). Ignorado pelo JS.');
+    }
+    renderGamescreen(parsed);
   }
 }
-function closeConsultantDirect() {
-  document.getElementById('consultantOverlay').classList.remove('active');
+
+function resumeSession() {
+  const lastLog = appState.turnLog[appState.turnLog.length - 1];
+  if (!lastLog) {
+    startSession(appState.level);
+    return;
+  }
+
+  const fakeParsed = {
+    narrative: lastLog.assistantNarrative,
+    feedback: '',
+    patient_pills: lastLog.patient_pills,
+    indicators: lastLog.indicators_snapshot,
+    case_state: lastLog.case_state,
+    phase_next: lastLog.phase
+  };
+
+  renderGamescreen(fakeParsed);
 }
 
-// ===================== EXPORT REPORT =====================
-function exportReport() {
-  const cfg = LEVEL_CONFIG[STATE.level];
-  const avg = Math.round((STATE.indicators.acuracia + STATE.indicators.fundamentacao + STATE.indicators.seguranca + STATE.indicators.conduta) / 4);
 
-  let html = `<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Relatório Folículo — ${STATE.playerName}</title>
-<style>body{font-family:'Source Sans 3',Helvetica,sans-serif;max-width:700px;margin:40px auto;padding:20px;color:#1E1A14;line-height:1.6}
-h1{font-family:'Playfair Display',Georgia,serif;color:#6B4226}h2{color:#5C5347;border-bottom:1px solid #D9D0C4;padding-bottom:6px;margin-top:24px}
-.ind{display:inline-block;margin:8px 16px 8px 0;padding:8px 16px;background:#F5F0EA;border-radius:8px}
-.ind strong{font-size:1.3rem}.hist{background:#F5F0EA;padding:16px;border-radius:8px;margin:8px 0;border-left:3px solid #6B4226}
-.meta{color:#8F8478;font-size:0.85rem}
-</style></head><body>`;
-  html += `<h1>🔬 Folículo — Relatório de Simulação</h1>`;
-  html += `<p class="meta">Aluno: <strong>${STATE.playerName}</strong> | Nível: ${cfg.label} | Data: ${new Date().toLocaleDateString('pt-BR')} | Média: ${avg}/100</p>`;
-  html += `<h2>Indicadores Finais</h2>`;
-  const names = ['Acurácia Observacional','Fundamentação Biológica','Segurança do Cliente','Conduta Profissional'];
-  const keys = ['acuracia','fundamentacao','seguranca','conduta'];
-  keys.forEach((k,i) => { html += `<div class="ind">${names[i]}: <strong>${STATE.indicators[k]}</strong>/100</div>`; });
+// ============================================================================
+// A CONSULTA — RENDER DA GAMESCREEN
+// ============================================================================
 
-  html += `<h2>Histórico de Turnos</h2>`;
-  STATE.history.forEach((msg, idx) => {
-    if (msg.role === 'user' && idx > 0) {
-      html += `<div class="hist"><strong>Aluno:</strong><br>${msg.content.replace(/\n/g,'<br>')}</div>`;
-    } else if (msg.role === 'assistant') {
-      try {
-        const parsed = JSON.parse(msg.content);
-        if (parsed.narrativa) html += `<div class="hist"><strong>Simulador:</strong><br>${parsed.narrativa.replace(/\n/g,'<br>')}</div>`;
-      } catch(e) {
-        html += `<div class="hist"><strong>Simulador:</strong><br>${msg.content.replace(/\n/g,'<br>')}</div>`;
+function renderGamescreen(parsed) {
+  const config = SIMULATOR_CONFIG;
+  const level = appState.level;
+  const totalTurns = config.levels[level].turns;
+  const lvlObj = config.levels[level];
+  const mc = config.microcopy.scene;
+
+  const prevTurn = appState.turnLog[appState.turnLog.length - 2];
+  const activeScene = {
+    eyebrow: 'CENA ' + String(appState.turn).padStart(2, '0'),
+    narrative: parsed.narrative || '',
+    feedback: (prevTurn && prevTurn.feedback) ? {
+      classification: prevTurn.articulation_class || 'parcial',
+      leadIn: 'Avaliação da sua última fala',
+      body: prevTurn.feedback
+    } : null
+  };
+
+  const pillStrip = (parsed.patient_pills || []).map(function(p) {
+    return {
+      label: p.label,
+      value: '',
+      modifier: p.tone === 'danger' ? 'alert' : (p.tone === 'warning' ? 'warning' : '')
+    };
+  });
+
+  const consultantLimit = lvlObj.consultantLimit || 0;
+  const consultantsRemaining = consultantLimit - appState.consultantsUsed;
+  const sections = [
+    {
+      title: 'INDICADORES',
+      type: 'indicators',
+      data: config.indicators.map(function(ind) {
+        return {
+          name: ind.name,
+          value: Math.round(appState.indicators[ind.id] || 0)
+        };
+      })
+    }
+  ];
+
+  if (consultantLimit > 0) {
+    sections.push({
+      title: 'CONSULTOR',
+      type: 'consultants',
+      list: config.consultants.map(function(c) {
+        return {
+          name: c.name,
+          role: c.role,
+          disabled: consultantsRemaining <= 0
+        };
+      }),
+      counter: consultantsRemaining + ' uso(s) restante(s)'
+    });
+  }
+
+  const sidePanel = { sections: sections };
+
+  const phaseObj = config.phases.find(function(p) { return p.id === (parsed.phase_next || 'engajar'); });
+  const phaseName = phaseObj ? phaseObj.name : '';
+  const sceneNumber = appState.turn;
+  const totalScenes = totalTurns + 1;
+
+  ActiveIA.scene.render({
+    topbar: {
+      mark: 'ACTIVE IA',
+      title: config.title,
+      phase: phaseName,
+      student: appState.studentName,
+      connectionStatus: 'connected'
+    },
+    monument: {
+      eyebrow: 'CENA',
+      turnNumber: sceneNumber,
+      totalTurns: totalScenes,
+      phaseLabel: phaseName
+    },
+    pillStrip: pillStrip,
+    scene: activeScene,
+    hint: {
+      strong: mc.hintArticulation.strong,
+      body: mc.hintArticulation.body
+    },
+    submit: {
+      placeholder: mc.placeholder,
+      submitLabel: mc.submitLabel,
+      hint: mc.hint,
+      showSaveDraft: false
+    },
+    sidePanel: sidePanel,
+    onSubmit: function() {
+      const textarea = document.getElementById('response-textarea');
+      const text = textarea ? textarea.value.trim() : '';
+      if (text.length < 1) return;
+      advanceTurn(text);
+    },
+    onConsult: function(idx) {
+      const consultant = config.consultants[idx];
+      if (consultant && appState.consultantsUsed < consultantLimit) {
+        requestConsultant(consultant);
       }
     }
   });
-
-  html += `<h2>Consultores Utilizados</h2>`;
-  html += STATE.consultantUsed.length > 0 ? `<p>${[...new Set(STATE.consultantUsed)].map(w => CONSULTANTS[w].name).join(', ')}</p>` : '<p>Nenhum consultor foi acionado.</p>';
-  html += `<p class="meta" style="margin-top:40px;">Simulador Folículo — Galícia Educação | Gerado automaticamente</p>`;
-  html += `</body></html>`;
-
-  const blob = new Blob([html], { type: 'text/html' });
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a'); a.href = url;
-  a.download = `Foliculo_Relatorio_${STATE.playerName.replace(/\s+/g,'_')}_${new Date().toISOString().split('T')[0]}.html`;
-  a.click(); URL.revokeObjectURL(url);
 }
 
-// ===================== INIT =====================
-(async function init() {
-  try {
-    await preloadCache();
-    // Apply theme from cache
-    const t = storageGet('foliculo_theme');
-    if (t === 'dark') {
-      document.documentElement.setAttribute('data-theme','dark');
-      document.querySelector('.theme-toggle').textContent = '☀️';
+// ============================================================================
+// CONSULTOR
+// ============================================================================
+function requestConsultant(consultant) {
+  const gameContext = {
+    moduleTitle: SIMULATOR_CONFIG.title,
+    studentName: appState.studentName,
+    level: SIMULATOR_CONFIG.levels[appState.level].label,
+    turnsTotal: SIMULATOR_CONFIG.levels[appState.level].turns,
+    currentTurn: appState.turn,
+    archetypeId: appState.archetypeId,
+    history: appState.turnLog.map(function(t) {
+      return {
+        turn: t.turn,
+        userResponse: t.userResponse,
+        assistantNarrative: t.assistantNarrative
+      };
+    })
+  };
+
+  ActiveIA.consultant.open({
+    consultant: consultant,
+    gameContext: gameContext,
+    onUsed: function() {
+      appState.consultantsUsed += 1;
+      ActiveIA.session.save(SIM_ID, appState);
+    },
+    onError: function(err) {
+      console.error('[A Consulta] Erro consultor:', err);
     }
-    if (checkDailyBlock()) return;
-    if (checkSession()) return;
-  } catch(e) {
-    console.error('Init error:', e);
-    document.getElementById('tutorial1').classList.add('active');
+  });
+}
+
+
+// ============================================================================
+// A CONSULTA — EPÍLOGO, DOSSIÊ, EXPORT
+// ============================================================================
+
+function showEpilogueModal() {
+  const mc = SIMULATOR_CONFIG.microcopy.epilogue;
+  const isHardFail = appState.hardFailed;
+
+  ActiveIA.modal.show({
+    eyebrow: 'A CONSULTA',
+    title: isHardFail ? mc.hardFailTitle : mc.title,
+    body: isHardFail ? mc.hardFailBody : mc.body,
+    actions: [
+      {
+        label: 'Avançar para o dossiê →',
+        primary: true,
+        onClick: function() {
+          finishSession();
+        }
+      }
+    ]
+  });
+}
+
+async function finishSession() {
+  ActiveIA.loading.show('Gerando seu dossiê…');
+
+  appState.userName = appState.studentName;
+
+  const sp = buildSystemPrompt();
+  const conceptIds = SIMULATOR_CONFIG.concepts.map(function(c) { return c.id; });
+  const conceptSchemaLines = conceptIds.map(function(id) {
+    return '    "' + id + '": "demonstrado|parcialmente_demonstrado|nao_demonstrado"';
+  }).join(',\n');
+
+  const finalAnalysisPrompt = 'A sessão terminou. '
+    + (appState.hardFailed ? 'Foi um hard fail (nutricionista quebrou uma regra profissional / deterioração de escopo).' : 'Foi um fim natural — completou os turnos.')
+    + '\n\nGere agora a ANÁLISE FINAL ESTRUTURADA. Retorne JSON estrito com este formato:\n\n'
+    + '{\n'
+    + '  "diagnosis_summary": "Resumo de 2-3 frases da condução.",\n'
+    + '  "concept_map": {\n'
+    + conceptSchemaLines + '\n'
+    + '  },\n'
+    + '  "concept_justifications": { ... mesma estrutura de IDs, com 1-2 frases de justificativa cada. Para conceitos não testáveis pelo arquétipo jogado, use "nao_demonstrado" + justificativa "Não testado por ausência de contexto neste arquétipo" (Lição 38 — NUNCA colocar como ponto a revisitar). },\n'
+    + '  "strengths": [{ "turn": N, "description": "MÁXIMO 8 PALAVRAS — sem qualificadores como \'sistematicamente\', \'com precisão técnica\', etc." }],\n'
+    + '  "weaknesses": [{ "turn": N, "description": "1-2 frases apontando o que ficou aquém — SOMENTE de turnos com articulation_class plena/parcial/fraca, NUNCA indeterminada." }],\n'
+    + '  "next_step_recommendation": { "action": "subir_nivel|repetir_nivel|voltar_nivel|revisar_modulo", "rationale": "..." },\n'
+    + '  "headline_metric": "Frase curta resumindo desempenho",\n'
+    + '  "linkedin_card": { "challenge": "...", "skills_demonstrated": ["...","..."] }\n'
+    + '}\n\n'
+    + 'Use APENAS os ' + conceptIds.length + ' IDs listados de concept_map. Weaknesses SOMENTE do arquétipo jogado — conceitos que só existiriam em outros arquétipos vão no concept_map como "nao_demonstrado" com justificativa clara, NUNCA nas weaknesses.';
+
+  try {
+    const response = await ActiveIA.callAPI({
+      systemFixed: sp.fixed,
+      systemDynamic: sp.dynamic,
+      messages: appState.history.concat([{ role: 'user', content: finalAnalysisPrompt }]),
+      maxTokens: 4000,
+      config: SIMULATOR_CONFIG
+    });
+
+    const diagnosis = response.parsed;
+    if (!diagnosis) {
+      throw new Error('Análise final vazia');
+    }
+
+    appState.diagnosis = diagnosis;
+    ActiveIA.session.save(SIM_ID, appState);
+
+    ActiveIA.daily.markComplete(SIM_ID);
+
+    ActiveIA.loading.hide();
+    renderDossier(diagnosis);
+  } catch (err) {
+    console.error('[A Consulta] Erro gerando dossiê:', err);
+    ActiveIA.loading.hide();
+    ActiveIA.modal.show({
+      eyebrow: 'ERRO',
+      title: 'Houve um erro gerando o dossiê',
+      body: 'Detalhes: ' + (err && err.message ? err.message : 'desconhecido'),
+      actions: [{ label: 'Ok', primary: true }]
+    });
   }
-})();
+}
+
+function renderDossier(diagnosis) {
+  const config = SIMULATOR_CONFIG;
+  const userName = (appState.userName || appState.studentName || 'Nutricionista').trim();
+  const nameParts = userName.split(/\s+/);
+  const firstName = nameParts[0] || userName;
+  const lastName = nameParts.length > 1 ? nameParts.slice(1).join(' ') : '';
+
+  const levelLabel = config.levels[appState.level].label;
+  const respondedTurns = appState.turnLog.filter(function(t) { return t.userResponse; });
+  const turnsPlayed = respondedTurns.length;
+
+  let subtitle = 'Concluiu a simulação no nível <strong style="color:#fff;">' + levelLabel + '</strong> · '
+    + turnsPlayed + ' ' + (turnsPlayed === 1 ? 'turno' : 'turnos') + '.';
+  if (appState.hardFailed) {
+    subtitle = 'Sessão encerrada por quebra de regra profissional ou deterioração do escopo.';
+  }
+
+  const articulationDone = respondedTurns.filter(function(t) { return t.articulation_class === 'plena'; }).length;
+  const articulationTotal = turnsPlayed;
+  const conceptsTotal = config.concepts.length;
+  const conceptsMastered = diagnosis.concept_map
+    ? Object.values(diagnosis.concept_map).filter(function(s) { return s === 'demonstrado'; }).length
+    : 0;
+
+  const recLabels = {
+    subir_nivel: levelLabel === 'Júnior' ? 'Avançar para o nível Pleno' :
+                 levelLabel === 'Pleno' ? 'Avançar para o nível Sênior' :
+                 'Manter Sênior — repetir com novo paciente',
+    repetir_nivel: 'Repetir ' + levelLabel + ' — consolidar antes de avançar',
+    voltar_nivel: levelLabel === 'Sênior' ? 'Voltar ao Pleno' :
+                  levelLabel === 'Pleno' ? 'Voltar ao Júnior' :
+                  'Revisar fundamentos antes de novo paciente',
+    revisar_modulo: 'Revisar o M01 antes de novo paciente'
+  };
+  const rec = diagnosis.next_step_recommendation || {};
+  const recActionLabel = recLabels[rec.action] || ('Repetir ' + levelLabel);
+
+  const dossierData = {
+    sessionId: 'CNS-' + new Date().toISOString().slice(0,10).replace(/-/g,'') + '-' + Math.floor(Math.random()*9000+1000),
+    firstName: firstName,
+    lastName: lastName,
+    subtitle: subtitle,
+    headlineGrid: [
+      { label: 'ARTICULAÇÃO', value: String(articulationDone), max: String(articulationTotal), sub: 'Turnos com articulação plena' },
+      { label: 'CONCEITOS DEMONSTRADOS', value: String(conceptsMastered), max: String(conceptsTotal), sub: 'Do M01 SAUNUT' },
+      { label: 'PRÓXIMO PASSO', valueText: recActionLabel, sub: rec.rationale ? rec.rationale.split('.')[0] + '.' : '' }
+    ],
+    indicators: config.indicators.map(function(ind) {
+      return {
+        name: ind.name,
+        value: Math.round(appState.indicators[ind.id] || 0),
+        max: 100
+      };
+    }),
+    conceptMap: config.concepts.map(function(c) {
+      const status = (diagnosis.concept_map && diagnosis.concept_map[c.id]) || 'nao_demonstrado';
+      const justification = (diagnosis.concept_justifications && diagnosis.concept_justifications[c.id]) || '';
+      return {
+        name: c.name,
+        reference: c.module_ref,
+        module_ref: c.module_ref,
+        status: status,
+        justification: justification
+      };
+    }),
+    strengths: (diagnosis.strengths || []).map(function(s) {
+      return {
+        turn: s.turn,
+        label: 'TURNO ' + String(s.turn).padStart(2, '0'),
+        description: s.description
+      };
+    }),
+    weaknesses: (diagnosis.weaknesses || []).map(function(w) {
+      return {
+        turn: w.turn,
+        label: 'TURNO ' + String(w.turn).padStart(2, '0'),
+        description: w.description
+      };
+    }),
+    recommendation: {
+      action: recActionLabel,
+      rationale: rec.rationale || ''
+    }
+  };
+
+  ActiveIA.dossier.render(dossierData, {});
+}
+
+function exportReport(diagnosis) {
+  appState.userName = appState.studentName;
+  ActiveIA.export.fullReport(appState, diagnosis, SIMULATOR_CONFIG);
+}
+
+function exportLinkedInCard(diagnosis) {
+  appState.userName = appState.studentName;
+  if (typeof ActiveIA.export.shareLinkedInModal === 'function') {
+    ActiveIA.export.shareLinkedInModal(appState, diagnosis, SIMULATOR_CONFIG);
+  } else if (typeof ActiveIA.export.linkedinCard === 'function') {
+    ActiveIA.export.linkedinCard(appState, diagnosis, SIMULATOR_CONFIG);
+  } else {
+    ActiveIA.modal.show({
+      eyebrow: 'INDISPONÍVEL',
+      title: 'Export LinkedIn não disponível',
+      body: 'Este simulador está numa versão do core que não expõe o export do LinkedIn.',
+      actions: [{ label: 'Ok', primary: true }]
+    });
+  }
+}
+
+
+// Inicialização
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', function() {
+    ActiveIA.init(SIMULATOR_CONFIG).then(function() {
+      // onCoreReady é chamado pelo core via window.onCoreReady
+    }).catch(function(err) {
+      console.error('[A Consulta] Falha ao inicializar core:', err);
+    });
+  });
+} else {
+  ActiveIA.init(SIMULATOR_CONFIG).then(function() {
+    // idem
+  }).catch(function(err) {
+    console.error('[A Consulta] Falha ao inicializar core:', err);
+  });
+}
+
+window.onCoreReady = onCoreReady;
 </script>
+
 </body>
 </html>
